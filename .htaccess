@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|tests|vendor)(/|$) - [F,L]
+    RewriteRule ^(\.env|\.env\..*|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml)$ - [F,L]
+
+    RewriteRule ^storage/(.*)$ /storage/app/public/$1 [END]
+    RewriteRule ^(.*)$ /public/$1 [L]
+</IfModule>

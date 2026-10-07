@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WhatsappClickController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,12 @@ use App\Http\Controllers\Admin\StoreAdminController;
 
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
+
+Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])
+    ->name('seo.sitemap');
+
+Route::get('/robots.txt', [SitemapController::class, 'robots'])
+    ->name('seo.robots');
 
 
 /*

@@ -1,3 +1,56 @@
+@php
+    $isNoIndexRoute = request()->routeIs([
+        'login',
+        'register',
+        'password.*',
+        'verification.*',
+    ]);
+
+    $seoTitle = trim($__env->yieldContent('title', config('seo.title')));
+    $seoDescription = trim($__env->yieldContent('description', config('seo.description')));
+    $seoCanonical = trim($__env->yieldContent('canonical', url()->current()));
+    $seoImage = trim($__env->yieldContent('image', asset(config('seo.image'))));
+    $seoType = trim($__env->yieldContent('type', 'website'));
+    $seoRobots = trim($__env->yieldContent(
+        'robots',
+        $isNoIndexRoute
+            ? 'noindex, nofollow'
+            : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+    ));
+
+    $baseStructuredData = [
+        '@context' => 'https://schema.org',
+        '@graph' => [
+            [
+                '@type' => 'Organization',
+                '@id' => url('/').'#organization',
+                'name' => config('seo.site_name'),
+                'url' => url('/'),
+                'logo' => asset('favicon.svg'),
+                'sameAs' => [
+                    'https://github.com/Angel-ETECH/Vende-Facil',
+                ],
+            ],
+            [
+                '@type' => 'WebSite',
+                '@id' => url('/').'#website',
+                'url' => url('/'),
+                'name' => config('seo.site_name'),
+                'description' => config('seo.description'),
+                'publisher' => [
+                    '@id' => url('/').'#organization',
+                ],
+                'inLanguage' => 'es-PE',
+                'potentialAction' => [
+                    '@type' => 'SearchAction',
+                    'target' => route('home').'?buscar={search_term_string}',
+                    'query-input' => 'required name=search_term_string',
+                ],
+            ],
+        ],
+    ];
+@endphp
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -10,17 +63,39 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <meta
-        name="description"
-        content="@yield('description', 'Descubre tiendas, productos y compra directamente por WhatsApp.')"
-    >
+    <meta name="description" content="{{ $seoDescription }}">
+    <meta name="robots" content="{{ $seoRobots }}">
+    <meta name="author" content="Angel ETECH">
+    <meta name="theme-color" content="#ff6b57">
 
     <title>
-        @yield('title', 'VendeFácil')
+        {{ $seoTitle }}
     </title>
 
+    <link rel="canonical" href="{{ $seoCanonical }}">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.svg') }}">
+
+    <meta property="og:site_name" content="{{ config('seo.site_name') }}">
+    <meta property="og:locale" content="{{ config('seo.locale') }}">
+    <meta property="og:type" content="{{ $seoType }}">
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
+    <meta property="og:url" content="{{ $seoCanonical }}">
+    <meta property="og:image" content="{{ $seoImage }}">
+    <meta property="og:image:alt" content="{{ $seoTitle }}">
+
+    <meta name="twitter:card" content="{{ config('seo.twitter_card') }}">
+    <meta name="twitter:title" content="{{ $seoTitle }}">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
+    <meta name="twitter:image" content="{{ $seoImage }}">
+
+    <script type="application/ld+json">
+        {!! json_encode($baseStructuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT) !!}
+    </script>
+
+    @stack('structured-data')
+    @stack('head')
 
     @vite([
         'resources/css/app.css',

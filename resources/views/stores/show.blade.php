@@ -1,10 +1,51 @@
 @extends('layouts.public')
 
-@section('title', $store->name . ' - VendeFácil')
+@php
+    $storeDescription = $store->description
+        ?: 'Explora el catálogo de '.$store->name.' y compra directamente por WhatsApp en VendeFácil.';
+
+    $storeImage = $store->logo
+        ? asset('storage/'.$store->logo)
+        : asset(config('seo.image'));
+
+    $storeUrl = route('stores.show', ['store' => $store->slug]);
+
+    $storeSchema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Store',
+        'name' => $store->name,
+        'description' => $storeDescription,
+        'url' => $storeUrl,
+        'image' => $storeImage,
+        'telephone' => '+'.$store->whatsapp,
+        'address' => [
+            '@type' => 'PostalAddress',
+            'streetAddress' => $store->address,
+            'addressLocality' => $store->city ?: 'Perú',
+            'addressCountry' => 'PE',
+        ],
+        'areaServed' => [
+            '@type' => 'Country',
+            'name' => 'Perú',
+        ],
+    ];
+@endphp
+
+@section('title', $store->name . ' | Tienda en VendeFácil')
 
 @section('description')
-{{ $store->description ?: 'Descubre los productos disponibles en ' . $store->name }}
+{{ $storeDescription }}
 @endsection
+
+@section('canonical', $storeUrl)
+
+@section('image', $storeImage)
+
+@push('structured-data')
+    <script type="application/ld+json">
+        {!! json_encode($storeSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT) !!}
+    </script>
+@endpush
 
 
 @section('content')

@@ -1,4 +1,4 @@
-# VendeFacil
+# VendeFácil
 
 <p align="center">
   <strong>Marketplace para negocios locales, productos independientes y ventas directas por WhatsApp.</strong>
@@ -12,43 +12,56 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/vendefacil-home.png" alt="Vista principal de VendeFacil">
+  <img src="docs/images/vendefacil-home.png" alt="Vista principal de VendeFácil">
 </p>
 
-## Descripcion
+## Descripción
 
-VendeFacil es una aplicacion web tipo marketplace creada con Laravel. Su objetivo es ayudar a pequenos negocios a tener una presencia digital sencilla: crear una tienda, publicar productos y recibir consultas de compradores directamente por WhatsApp.
+VendeFácil es una aplicación web tipo marketplace creada con Laravel. Su objetivo es ayudar a pequeños negocios a tener una presencia digital sencilla: crear una tienda, publicar productos y recibir consultas de compradores directamente por WhatsApp.
 
-El proyecto incluye una experiencia publica para explorar productos y tiendas, y un panel privado para que cada vendedor administre su negocio.
+El proyecto incluye una experiencia pública para explorar productos y tiendas, y un panel privado para que cada vendedor administre su negocio.
 
-## Caracteristicas
+## Características
 
-- Home publico con buscador de productos y tiendas.
-- Filtros por categoria, ciudad y disponibilidad de delivery.
-- Pagina publica para cada tienda con sus productos activos.
-- Registro, login, recuperacion de contrasena y verificacion de correo.
-- Panel para vendedores con administracion de tienda.
-- CRUD de productos con imagen, precio, stock y categoria.
+- Home público con buscador de productos y tiendas.
+- Filtros por categoría, ciudad y disponibilidad de delivery.
+- Página pública para cada tienda con sus productos activos.
+- Registro, login, recuperación de contraseña y verificación de correo.
+- Panel para vendedores con administración de tienda.
+- CRUD de productos con imagen, precio, stock y categoría.
 - Contacto directo por WhatsApp para tiendas y productos.
 - Registro de clics a WhatsApp y visitas a tiendas.
-- Panel de administracion para revisar, pausar o eliminar tiendas.
-- Diseno responsive con Blade, Tailwind CSS y Alpine.js.
+- Panel de administración para revisar, pausar o eliminar tiendas.
+- Diseño responsive con Blade, Tailwind CSS y Alpine.js.
 
 ## Seguridad
 
 El proyecto incluye varias medidas de seguridad aplicadas sobre la base de Laravel:
 
-- Autenticacion con Laravel Breeze.
-- Hash seguro de contrasenas.
-- Proteccion CSRF en formularios.
-- Limitacion de intentos en login, registro, reset de contrasena, zona privada y admin.
-- Proteccion de rutas con `auth`, `verified` y middleware `admin`.
-- Validacion de imagenes por tipo, peso y dimensiones.
-- Proteccion contra asignacion masiva de campos sensibles como `is_admin`, `user_id`, `store_id` y `active`.
+- Autenticación con Laravel Breeze.
+- Hash seguro de contraseñas.
+- Protección CSRF en formularios.
+- Limitación de intentos en login, registro, reset de contraseña, zona privada y admin.
+- Protección de rutas con `auth`, `verified` y middleware `admin`.
+- Validación de imágenes por tipo, peso y dimensiones.
+- Protección contra asignación masiva de campos sensibles como `is_admin`, `user_id`, `store_id` y `active`.
 - Headers de seguridad: `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Content-Security-Policy`, COOP y CORP.
 - Sesiones cifradas y cookies `HttpOnly`/`SameSite`.
 
-## Tecnologias
+## SEO
+
+El proyecto queda preparado para indexación y vista social:
+
+- Títulos y descripciones optimizados para páginas públicas.
+- Canonical URL para evitar duplicados.
+- Open Graph y Twitter Cards para compartir mejor en redes.
+- Datos estructurados JSON-LD para `Organization`, `WebSite`, búsqueda interna y tiendas.
+- `robots.txt` dinámico con rutas privadas bloqueadas.
+- `sitemap.xml` dinámico con portada y tiendas activas.
+- `noindex` en login, registro, panel privado, perfil y administración.
+- Imagen social en `public/images/seo/vendefacil-home.png`.
+
+## Tecnologías
 
 - Laravel 12
 - PHP 8.2
@@ -61,7 +74,7 @@ El proyecto incluye varias medidas de seguridad aplicadas sobre la base de Larav
 - Composer
 - NPM
 
-## Instalacion Local
+## Instalación Local
 
 Clona el repositorio:
 
@@ -111,7 +124,7 @@ Ejecuta migraciones y seeders:
 php artisan migrate --seed
 ```
 
-Crea el enlace para imagenes publicas:
+Crea el enlace para imágenes públicas:
 
 ```bash
 php artisan storage:link
@@ -135,7 +148,7 @@ Luego abre:
 http://127.0.0.1:8000
 ```
 
-## Comandos Utiles
+## Comandos Útiles
 
 Ejecutar frontend en desarrollo:
 
@@ -143,13 +156,13 @@ Ejecutar frontend en desarrollo:
 npm run dev
 ```
 
-Reconstruir assets para produccion:
+Reconstruir assets para producción:
 
 ```bash
 npm run build
 ```
 
-Limpiar caches de Laravel:
+Limpiar cachés de Laravel:
 
 ```bash
 php artisan optimize:clear
@@ -160,6 +173,14 @@ Ver rutas:
 ```bash
 php artisan route:list
 ```
+
+## Despliegue En InfinityFree
+
+Para probar el proyecto en InfinityFree, revisa la guía preparada en:
+
+[docs/deploy-infinityfree.md](docs/deploy-infinityfree.md)
+
+El proyecto incluye un `.htaccess` de raíz para que InfinityFree redirija las visitas hacia `public/` sin exponer directamente archivos sensibles de Laravel.
 
 ## Estructura Principal
 
@@ -184,6 +205,6 @@ docs/
 
 ## Autor
 
-Desarrollado por **Angel ETECH** como proyecto de marketplace para pequenos negocios y ventas por WhatsApp.
+Desarrollado por **Angel ETECH** como proyecto de marketplace para pequeños negocios y ventas por WhatsApp.
 
 Repositorio: [Angel-ETECH/Vende-Facil](https://github.com/Angel-ETECH/Vende-Facil)

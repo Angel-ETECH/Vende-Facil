@@ -1,10 +1,14 @@
 @extends('layouts.public')
 
-@section('title', 'VendeFácil - Encuentra algo que te encante')
+@section('title', 'VendeFácil | Marketplace de negocios locales en Perú')
 
 @section('description')
-Descubre tiendas independientes, productos increíbles y compra directamente por WhatsApp.
+Encuentra tiendas independientes, productos únicos y negocios locales con delivery en Perú. Compra directo por WhatsApp en VendeFácil.
 @endsection
+
+@section('canonical', route('home'))
+
+@section('image', asset('images/seo/vendefacil-home.png'))
 
 
 @section('content')
