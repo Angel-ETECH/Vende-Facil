@@ -1291,6 +1291,14 @@ Encuentra tiendas independientes, productos únicos y negocios locales con deliv
                                 Abierto
                             </div>
 
+                            @if($store->isFeatured())
+                                <div
+                                    class="absolute left-5 top-5 rounded-full bg-[#ffd66b] px-3 py-1.5 text-xs font-black text-[#4e3b20] shadow-sm"
+                                >
+                                    Destacada
+                                </div>
+                            @endif
+
                         </div>
 
 

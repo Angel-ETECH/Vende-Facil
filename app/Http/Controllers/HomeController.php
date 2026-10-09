@@ -218,6 +218,10 @@ class HomeController extends Controller
             ->when($delivery, function ($query) {
                 $query->where('delivery_available', true);
             })
+            ->orderByRaw(
+                'case when featured = 1 and (featured_until is null or featured_until > ?) then 1 else 0 end desc',
+                [now()]
+            )
             ->latest()
             ->take(9)
             ->get();

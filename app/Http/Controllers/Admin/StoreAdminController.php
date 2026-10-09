@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\PaymentProof;
 use App\Models\Product;
 use App\Models\Store;
 use App\Support\SafePublicStorage;
@@ -79,6 +80,12 @@ class StoreAdminController extends Controller
 
         $totalProducts = Product::count();
 
+        $unlimitedStores = Store::where('unlimited_products', true)->count();
+
+        $featuredStores = Store::where('featured', true)->count();
+
+        $pendingPaymentProofs = PaymentProof::where('status', PaymentProof::STATUS_PENDING)->count();
+
         $cities = Store::query()
             ->whereNotNull('city')
             ->where('city', '!=', '')
@@ -96,7 +103,10 @@ class StoreAdminController extends Controller
             'cities',
             'totalStores',
             'activeStores',
-            'totalProducts'
+            'totalProducts',
+            'unlimitedStores',
+            'featuredStores',
+            'pendingPaymentProofs'
         ));
     }
 
@@ -116,10 +126,55 @@ class StoreAdminController extends Controller
             );
     }
 
+    public function toggleUnlimitedProducts(Store $store)
+    {
+        $willActivate = ! $store->unlimited_products;
+
+        $store->forceFill([
+            'unlimited_products' => $willActivate,
+            'unlimited_products_activated_at' => $willActivate ? now() : null,
+        ])->save();
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                $willActivate
+                    ? 'La tienda "' . $store->name . '" ahora tiene productos ilimitados.'
+                    : 'La tienda "' . $store->name . '" volvió al límite gratuito de productos.'
+            );
+    }
+
+    public function toggleFeatured(Store $store)
+    {
+        $willActivate = ! $store->featured;
+
+        $store->forceFill([
+            'featured' => $willActivate,
+            'featured_until' => $willActivate
+                ? now()->addDays(config('vendefacil.featured_days'))
+                : null,
+        ])->save();
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                $willActivate
+                    ? 'La tienda "' . $store->name . '" ahora está destacada en la página principal.'
+                    : 'La tienda "' . $store->name . '" dejó de estar destacada.'
+            );
+    }
+
     public function show(Store $store)
     {
         $store->load([
             'user',
+            'paymentProofs' => function ($query) {
+                $query
+                    ->with('reviewer')
+                    ->latest();
+            },
             'products' => function ($query) {
                 $query
                     ->with('category')
@@ -162,6 +217,19 @@ class StoreAdminController extends Controller
         foreach ($store->products as $product) {
 
             $this->deletePublicUpload($product->image, 'products/');
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ELIMINAR COMPROBANTES DE PAGO
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($store->paymentProofs as $paymentProof) {
+
+            $this->deletePublicUpload($paymentProof->proof_path, 'payment-proofs/');
 
         }
 

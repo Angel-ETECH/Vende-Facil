@@ -96,12 +96,59 @@
 
 
                         <a
+                            href="{{ route('seller.payments.index') }}"
+                            class="
+                                rounded-full px-4 py-2 text-sm font-black transition
+
+                                {{ request()->routeIs('seller.payments.*')
+                                    ? 'bg-[#442d35] text-white'
+                                    : 'text-[#6f5b5e] hover:bg-[#f3e9e2]'
+                                }}
+                            "
+                        >
+                            Plan y pagos
+                        </a>
+
+
+                        <a
                             href="{{ route('stores.show', $navStore) }}"
                             target="_blank"
                             rel="noopener noreferrer"
                             class="rounded-full px-4 py-2 text-sm font-black text-[#6f5b5e] transition hover:bg-[#f3e9e2]"
                         >
                             Ver tienda
+                        </a>
+
+                    @endif
+
+                    @if(auth()->user()->is_admin)
+
+                        <a
+                            href="{{ route('admin.stores.index') }}"
+                            class="
+                                rounded-full px-4 py-2 text-sm font-black transition
+
+                                {{ request()->routeIs('admin.stores.*')
+                                    ? 'bg-[#ff6b57] text-white'
+                                    : 'text-[#6f5b5e] hover:bg-[#f3e9e2]'
+                                }}
+                            "
+                        >
+                            Tiendas admin
+                        </a>
+
+                        <a
+                            href="{{ route('admin.payments.index') }}"
+                            class="
+                                rounded-full px-4 py-2 text-sm font-black transition
+
+                                {{ request()->routeIs('admin.payments.*')
+                                    ? 'bg-[#ff6b57] text-white'
+                                    : 'text-[#6f5b5e] hover:bg-[#f3e9e2]'
+                                }}
+                            "
+                        >
+                            Pagos
                         </a>
 
                     @endif
@@ -367,23 +414,31 @@
                     >
                         Ver tienda
                     </a>
-                    @if(auth()->user()->is_admin)
 
-    <a
-        href="{{ route('admin.stores.index') }}"
-        class="
-            rounded-full px-4 py-2 text-sm font-black transition
+                    <a
+                        href="{{ route('seller.payments.index') }}"
+                        class="block rounded-[12px] px-4 py-3 font-black text-[#5f4c50] hover:bg-[#f5ece5]"
+                    >
+                        Plan y pagos
+                    </a>
 
-            {{ request()->routeIs('admin.*')
-                ? 'bg-[#ff6b57] text-white'
-                : 'text-[#6f5b5e] hover:bg-[#f3e9e2]'
-            }}
-        "
-    >
-        Administración
-    </a>
+                @endif
 
-@endif
+                @if(auth()->user()->is_admin)
+
+                    <a
+                        href="{{ route('admin.stores.index') }}"
+                        class="block rounded-[12px] px-4 py-3 font-black text-[#5f4c50] hover:bg-[#f5ece5]"
+                    >
+                        Tiendas admin
+                    </a>
+
+                    <a
+                        href="{{ route('admin.payments.index') }}"
+                        class="block rounded-[12px] px-4 py-3 font-black text-[#5f4c50] hover:bg-[#f5ece5]"
+                    >
+                        Pagos
+                    </a>
 
                 @endif
 

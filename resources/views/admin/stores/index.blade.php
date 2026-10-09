@@ -138,7 +138,7 @@
             {{-- ================================================= --}}
 
             <div
-                class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
             >
 
                 {{-- TOTAL TIENDAS --}}
@@ -235,9 +235,141 @@
                 </div>
 
 
+                {{-- ILIMITADAS --}}
+                <div
+                    class="rounded-[24px] border border-[#eaded5] bg-white p-5"
+                >
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-sm font-bold text-[#8e797b]">
+                                Plan ilimitado
+                            </p>
+
+                            <p class="mt-1 text-3xl font-black text-[#35272a]">
+                                {{ $unlimitedStores }}
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f1edff] text-[#5b49a8]"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.8"
+                                stroke="currentColor"
+                                class="h-6 w-6"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 6v12m6-6H6"
+                                />
+                            </svg>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {{-- DESTACADAS --}}
+                <div
+                    class="rounded-[24px] border border-[#eaded5] bg-white p-5"
+                >
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-sm font-bold text-[#8e797b]">
+                                Destacadas
+                            </p>
+
+                            <p class="mt-1 text-3xl font-black text-[#35272a]">
+                                {{ $featuredStores }}
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff3da] text-[#806226]"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.8"
+                                stroke="currentColor"
+                                class="h-6 w-6"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="m11.48 3.5 2.46 4.99 5.5.8-3.98 3.88.94 5.48-4.92-2.59-4.92 2.59.94-5.48-3.98-3.88 5.5-.8 2.46-4.99Z"
+                                />
+                            </svg>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- PAGOS PENDIENTES --}}
+                <a
+                    href="{{ route('admin.payments.index') }}"
+                    class="rounded-[24px] border border-[#eaded5] bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-[0_14px_30px_rgba(91,53,43,.08)]"
+                >
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-sm font-bold text-[#8e797b]">
+                                Pagos pendientes
+                            </p>
+
+                            <p class="mt-1 text-3xl font-black text-[#35272a]">
+                                {{ $pendingPaymentProofs }}
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e7f5ef] text-[#427764]"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.8"
+                                stroke="currentColor"
+                                class="h-6 w-6"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M2.25 18.75h19.5M3.75 6.75h16.5v9H3.75v-9Zm3 3h.008v.008H6.75V9.75Zm10.5 3h.008v.008h-.008v-.008Z"
+                                />
+                            </svg>
+                        </div>
+
+                    </div>
+
+                </a>
+
+
                 {{-- PRODUCTOS --}}
                 <div
-                    class="rounded-[24px] border border-[#eaded5] bg-white p-5 sm:col-span-2 lg:col-span-1"
+                    class="rounded-[24px] border border-[#eaded5] bg-white p-5"
                 >
 
                     <div class="flex items-center justify-between">
@@ -519,6 +651,14 @@
                                                         {{ $store->name }}
                                                     </p>
 
+                                                    @if($store->isFeatured())
+                                                        <span
+                                                            class="mt-2 inline-flex w-fit rounded-full bg-[#fff3da] px-3 py-1 text-[11px] font-black text-[#806226]"
+                                                        >
+                                                            Destacada
+                                                        </span>
+                                                    @endif
+
                                                     <p
                                                         class="mt-1 max-w-[220px] truncate text-xs text-[#927e80]"
                                                     >
@@ -556,11 +696,19 @@
                                         {{-- PRODUCTOS --}}
                                         <td class="px-5 py-4">
 
-                                            <span
-                                                class="rounded-full bg-[#fff3da] px-3 py-1.5 text-xs font-black text-[#806226]"
-                                            >
-                                                {{ $store->products_count }}
-                                            </span>
+                                            <div class="flex flex-col gap-2">
+                                                <span
+                                                    class="w-fit rounded-full bg-[#fff3da] px-3 py-1.5 text-xs font-black text-[#806226]"
+                                                >
+                                                    {{ $store->products_count }}
+                                                </span>
+
+                                                <span
+                                                    class="w-fit rounded-full px-3 py-1.5 text-[11px] font-black {{ $store->unlimited_products ? 'bg-[#f1edff] text-[#5b49a8]' : 'bg-[#eef0f4] text-[#5f6978]' }}"
+                                                >
+                                                    {{ $store->unlimited_products ? 'Ilimitado' : 'Gratis ' . config('vendefacil.free_product_limit') }}
+                                                </span>
+                                            </div>
 
                                         </td>
 
@@ -920,6 +1068,12 @@
                                             >
                                                 {{ $store->products_count }}
                                                 productos
+                                            </span>
+
+                                            <span
+                                                class="rounded-full px-3 py-1 text-xs font-black {{ $store->unlimited_products ? 'bg-[#f1edff] text-[#5b49a8]' : 'bg-[#eef0f4] text-[#5f6978]' }}"
+                                            >
+                                                {{ $store->unlimited_products ? 'Ilimitado' : 'Gratis' }}
                                             </span>
 
                                             @if($store->active)

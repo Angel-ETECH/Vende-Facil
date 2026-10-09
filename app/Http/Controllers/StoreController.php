@@ -31,7 +31,12 @@ class StoreController extends Controller
             'name' => ['bail', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'whatsapp' => ['bail', 'required', 'regex:/^51[0-9]{9}$/'],
-            'address' => ['nullable', 'string', 'max:255'],
+            'address' => [
+                Rule::requiredIf(! $request->boolean('delivery_available')),
+                'nullable',
+                'string',
+                'max:255',
+            ],
             'city' => ['bail', 'required', 'string', 'max:100'],
             'delivery_available' => ['nullable', 'boolean'],
             'logo' => [
@@ -39,6 +44,8 @@ class StoreController extends Controller
                 File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048),
                 Rule::dimensions()->maxWidth(3000)->maxHeight(3000),
             ],
+        ], [
+            'address.required' => 'Agrega una dirección o referencia si tu tienda no ofrece delivery.',
         ]);
 
 
@@ -105,7 +112,12 @@ class StoreController extends Controller
             'name' => ['bail', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'whatsapp' => ['bail', 'required', 'regex:/^51[0-9]{9}$/'],
-            'address' => ['nullable', 'string', 'max:255'],
+            'address' => [
+                Rule::requiredIf(! $request->boolean('delivery_available')),
+                'nullable',
+                'string',
+                'max:255',
+            ],
             'city' => ['bail', 'required', 'string', 'max:100'],
             'delivery_available' => ['nullable', 'boolean'],
             'logo' => [
@@ -113,6 +125,8 @@ class StoreController extends Controller
                 File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048),
                 Rule::dimensions()->maxWidth(3000)->maxHeight(3000),
             ],
+        ], [
+            'address.required' => 'Agrega una dirección o referencia si tu tienda no ofrece delivery.',
         ]);
 
 

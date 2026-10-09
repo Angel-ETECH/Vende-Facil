@@ -26,12 +26,15 @@ El proyecto incluye una experiencia pública para explorar productos y tiendas, 
 - Home público con buscador de productos y tiendas.
 - Filtros por categoría, ciudad y disponibilidad de delivery.
 - Página pública para cada tienda con sus productos activos.
+- Ubicación de tienda con dirección, ciudad y acceso a Google Maps.
 - Registro, login, recuperación de contraseña y verificación de correo.
 - Panel para vendedores con administración de tienda.
 - CRUD de productos con imagen, precio, stock y categoría.
+- Límite gratuito de productos y plan de productos ilimitados.
+- Subida de comprobantes de pago por Yape o BCP.
 - Contacto directo por WhatsApp para tiendas y productos.
 - Registro de clics a WhatsApp y visitas a tiendas.
-- Panel de administración para revisar, pausar o eliminar tiendas.
+- Panel de administración para revisar pagos, destacar, pausar o eliminar tiendas.
 - Diseño responsive con Blade, Tailwind CSS y Alpine.js.
 
 ## Seguridad

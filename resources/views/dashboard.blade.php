@@ -85,6 +85,12 @@
         $setupPercent = $setupItems->isNotEmpty()
             ? round(($setupCompleted / $setupItems->count()) * 100)
             : 0;
+
+        $productLimit = config('vendefacil.free_product_limit');
+        $remainingProductSlots = $store
+            ? $store->remainingFreeProducts($totalProducts)
+            : 0;
+        $planPrice = config('vendefacil.unlimited_products_price');
     @endphp
 
 
@@ -239,6 +245,57 @@
 
                     {{ session('error') }}
 
+                </div>
+
+            @endif
+
+
+            @if($store)
+
+                <div
+                    class="mt-6 rounded-[24px] border border-[#eaded5] bg-white p-5"
+                >
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-xs font-black uppercase tracking-[.12em] text-[#9b8583]">
+                                Plan de productos
+                            </p>
+
+                            <h2 class="mt-2 text-xl font-black tracking-[-.03em] text-[#35272a]">
+                                @if($store->unlimited_products)
+                                    Productos ilimitados activos
+                                @else
+                                    {{ $totalProducts }} de {{ $productLimit }} productos gratis usados
+                                @endif
+                            </h2>
+
+                            <p class="mt-1 text-sm leading-6 text-[#806d70]">
+                                @if($store->unlimited_products)
+                                    Puedes publicar productos sin límite.
+                                @else
+                                    Te quedan {{ $remainingProductSlots }} productos gratis. El plan ilimitado cuesta S/ {{ $planPrice }}.
+                                @endif
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2">
+                            <a
+                                href="{{ route('products.index') }}"
+                                class="inline-flex items-center justify-center rounded-full bg-[#442d35] px-5 py-3 text-sm font-black text-white transition hover:bg-[#ff6b57]"
+                            >
+                                Gestionar catálogo
+                            </a>
+
+                            @unless($store->unlimited_products)
+                                <a
+                                    href="{{ route('seller.payments.index') }}"
+                                    class="inline-flex items-center justify-center rounded-full bg-[#fff3da] px-5 py-3 text-sm font-black text-[#806226] transition hover:bg-[#ffe9ba]"
+                                >
+                                    Subir comprobante
+                                </a>
+                            @endunless
+                        </div>
+                    </div>
                 </div>
 
             @endif

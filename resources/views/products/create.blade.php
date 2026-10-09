@@ -97,6 +97,14 @@
             @endif
 
 
+            @if ($hasReachedFreeLimit)
+
+                <div class="mt-8">
+                    @include('products.partials.upgrade-card')
+                </div>
+
+            @else
+
             <form
                 action="{{ route('products.store') }}"
                 method="POST"
@@ -552,6 +560,8 @@
                 </div>
 
             </form>
+
+            @endif
 
         </div>
 

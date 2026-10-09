@@ -98,6 +98,14 @@
                                     {{ $store->delivery_available ? 'Con delivery' : 'Sin delivery' }}
                                 </span>
 
+                                @if($store->isFeatured())
+                                    <span
+                                        class="rounded-full bg-[#f1edff] px-3 py-1.5 text-xs font-black text-[#5b49a8]"
+                                    >
+                                        Destacada
+                                    </span>
+                                @endif
+
                             </div>
 
 
@@ -156,12 +164,15 @@
             </div>
 
 
-            <div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
 
                 <div class="rounded-[24px] border border-[#eaded5] bg-white p-5">
                     <p class="text-sm font-bold text-[#8e797b]">Productos</p>
                     <p class="mt-1 text-3xl font-black text-[#35272a]">{{ $store->products_count }}</p>
-                    <p class="mt-1 text-xs font-bold text-[#927e80]">{{ $store->active_products_count }} activos</p>
+                    <p class="mt-1 text-xs font-bold text-[#927e80]">
+                        {{ $store->active_products_count }} activos ·
+                        {{ $store->unlimited_products ? 'ilimitado' : 'límite ' . config('vendefacil.free_product_limit') }}
+                    </p>
                 </div>
 
 
@@ -183,6 +194,32 @@
                     <p class="text-sm font-bold text-[#8e797b]">Registro</p>
                     <p class="mt-1 text-3xl font-black text-[#35272a]">{{ $store->created_at->format('d/m') }}</p>
                     <p class="mt-1 text-xs font-bold text-[#927e80]">{{ $store->created_at->format('Y') }}</p>
+                </div>
+
+
+                <div class="rounded-[24px] border border-[#eaded5] bg-white p-5">
+                    <p class="text-sm font-bold text-[#8e797b]">Plan</p>
+                    <p class="mt-1 text-2xl font-black text-[#35272a]">
+                        {{ $store->unlimited_products ? 'Ilimitado' : 'Gratis' }}
+                    </p>
+                    <p class="mt-1 text-xs font-bold text-[#927e80]">
+                        {{ $store->unlimited_products ? 'Productos sin límite' : config('vendefacil.free_product_limit') . ' productos gratis' }}
+                    </p>
+                </div>
+
+
+                <div class="rounded-[24px] border border-[#eaded5] bg-white p-5">
+                    <p class="text-sm font-bold text-[#8e797b]">Destacada</p>
+                    <p class="mt-1 text-2xl font-black text-[#35272a]">
+                        {{ $store->isFeatured() ? 'Sí' : 'No' }}
+                    </p>
+                    <p class="mt-1 text-xs font-bold text-[#927e80]">
+                        @if($store->isFeatured())
+                            Hasta {{ $store->featured_until?->format('d/m/Y') ?: 'sin fecha' }}
+                        @else
+                            Orden normal en el home
+                        @endif
+                    </p>
                 </div>
 
             </div>
@@ -218,6 +255,21 @@
                             <div>
                                 <dt class="text-xs font-black uppercase tracking-[.08em] text-[#a08a89]">WhatsApp</dt>
                                 <dd class="mt-1 text-sm font-bold text-[#514043]">+{{ $store->whatsapp }}</dd>
+                            </div>
+
+
+                            <div>
+                                <dt class="text-xs font-black uppercase tracking-[.08em] text-[#a08a89]">Plan de productos</dt>
+                                <dd class="mt-1 text-sm font-bold text-[#514043]">
+                                    {{ $store->unlimited_products ? 'Productos ilimitados' : 'Plan gratis' }}
+                                </dd>
+                                <dd class="mt-1 text-xs text-[#927e80]">
+                                    @if($store->unlimited_products)
+                                        Activado {{ $store->unlimited_products_activated_at?->format('d/m/Y H:i') ?: 'manualmente' }}
+                                    @else
+                                        Hasta {{ config('vendefacil.free_product_limit') }} productos sin pago.
+                                    @endif
+                                </dd>
                             </div>
 
                         </dl>
@@ -278,7 +330,93 @@
                                 <span aria-hidden="true">{{ $store->active ? 'II' : '>' }}</span>
                             </button>
 
+
+                            <form
+                                action="{{ route('admin.stores.unlimited-products', $store) }}"
+                                method="POST"
+                            >
+                                @csrf
+                                @method('PATCH')
+
+                                <button
+                                    type="submit"
+                                    class="flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-sm font-black transition {{ $store->unlimited_products ? 'bg-[#eef0f4] text-[#5f6978] hover:bg-[#e3e7ee]' : 'bg-[#f1edff] text-[#5b49a8] hover:bg-[#e7e1ff]' }}"
+                                >
+                                    {{ $store->unlimited_products ? 'Quitar ilimitados' : 'Activar ilimitados' }}
+                                    <span aria-hidden="true">{{ $store->unlimited_products ? '-' : '+' }}</span>
+                                </button>
+                            </form>
+
+
+                            <form
+                                action="{{ route('admin.stores.featured', $store) }}"
+                                method="POST"
+                            >
+                                @csrf
+                                @method('PATCH')
+
+                                <button
+                                    type="submit"
+                                    class="flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-sm font-black transition {{ $store->isFeatured() ? 'bg-[#eef0f4] text-[#5f6978] hover:bg-[#e3e7ee]' : 'bg-[#fff3da] text-[#806226] hover:bg-[#ffe9ba]' }}"
+                                >
+                                    {{ $store->isFeatured() ? 'Quitar destacada' : 'Destacar ' . config('vendefacil.featured_days') . ' días' }}
+                                    <span aria-hidden="true">{{ $store->isFeatured() ? '-' : '*' }}</span>
+                                </button>
+                            </form>
+
                         </div>
+
+                    </div>
+
+
+                    <div class="rounded-[28px] border border-[#eaded5] bg-white p-6">
+
+                        <div class="flex items-center justify-between gap-3">
+                            <h2 class="text-lg font-black text-[#35272a]">
+                                Pagos de la tienda
+                            </h2>
+
+                            <a
+                                href="{{ route('admin.payments.index') }}"
+                                class="text-xs font-black text-[#ff604c] transition hover:text-[#dc4e3d]"
+                            >
+                                Ver todos
+                            </a>
+                        </div>
+
+                        @if($store->paymentProofs->isEmpty())
+                            <p class="mt-5 rounded-[18px] bg-[#fff8f1] px-4 py-5 text-sm font-bold text-[#806d70]">
+                                Esta tienda todavía no envió comprobantes.
+                            </p>
+                        @else
+                            <div class="mt-5 space-y-3">
+                                @foreach($store->paymentProofs->take(4) as $paymentProof)
+                                    <div class="rounded-[18px] border border-[#eaded5] bg-[#fffdf9] px-4 py-3">
+                                        <div class="flex flex-wrap items-center justify-between gap-2">
+                                            <span class="rounded-full px-3 py-1 text-xs font-black {{ $paymentProof->status === 'approved' ? 'bg-[#e7f5ef] text-[#427764]' : ($paymentProof->status === 'rejected' ? 'bg-[#fff0ec] text-[#b45040]' : 'bg-[#fff3da] text-[#806226]') }}">
+                                                {{ $paymentProof->statusLabel() }}
+                                            </span>
+
+                                            <a
+                                                href="{{ asset('storage/' . $paymentProof->proof_path) }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="text-xs font-black text-[#496d9d]"
+                                            >
+                                                Archivo
+                                            </a>
+                                        </div>
+
+                                        <p class="mt-2 text-sm font-black text-[#35272a]">
+                                            S/ {{ number_format($paymentProof->amount, 2) }} · {{ strtoupper($paymentProof->method) }}
+                                        </p>
+                                        <p class="mt-1 text-xs font-bold text-[#927e80]">
+                                            {{ $paymentProof->created_at->format('d/m/Y H:i') }}
+                                        </p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
 
                     </div>
 

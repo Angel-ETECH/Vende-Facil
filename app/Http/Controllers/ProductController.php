@@ -30,9 +30,22 @@ class ProductController extends Controller
             ->latest()
             ->get();
 
+        $productLimit = config('vendefacil.free_product_limit');
+        $productCount = $products->count();
+        $remainingProductSlots = $store->remainingFreeProducts($productCount);
+        $planPrice = config('vendefacil.unlimited_products_price');
+        $paymentNumber = config('vendefacil.payment_number');
+        $paymentWhatsappUrl = $this->paymentWhatsappUrl($store);
+
         return view('products.index', compact(
             'store',
-            'products'
+            'products',
+            'productLimit',
+            'productCount',
+            'remainingProductSlots',
+            'planPrice',
+            'paymentNumber',
+            'paymentWhatsappUrl'
         ));
     }
 
@@ -47,11 +60,26 @@ class ProductController extends Controller
                 ->with('error', 'Primero debes crear una tienda.');
         }
 
+        $productLimit = config('vendefacil.free_product_limit');
+        $productCount = $store->products()->count();
+        $remainingProductSlots = $store->remainingFreeProducts($productCount);
+        $hasReachedFreeLimit = ! $store->canCreateMoreProducts($productCount);
+        $planPrice = config('vendefacil.unlimited_products_price');
+        $paymentNumber = config('vendefacil.payment_number');
+        $paymentWhatsappUrl = $this->paymentWhatsappUrl($store);
+
         $categories = Category::orderBy('name')->get();
 
         return view('products.create', compact(
             'store',
-            'categories'
+            'categories',
+            'productLimit',
+            'productCount',
+            'remainingProductSlots',
+            'hasReachedFreeLimit',
+            'planPrice',
+            'paymentNumber',
+            'paymentWhatsappUrl'
         ));
     }
 
@@ -64,6 +92,12 @@ class ProductController extends Controller
             return redirect()
                 ->route('stores.create')
                 ->with('error', 'Primero debes crear una tienda.');
+        }
+
+        if (! $store->canCreateMoreProducts()) {
+            return redirect()
+                ->route('products.index')
+                ->with('error', 'Ya usaste tus 10 productos gratis. Para publicar más, activa el plan de productos ilimitados con Yape o BCP.');
         }
 
         $validated = $request->validate([
@@ -240,5 +274,15 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('success', 'Producto eliminado correctamente.');
+    }
+
+    private function paymentWhatsappUrl($store): string
+    {
+        $message = 'Hola, quiero activar productos ilimitados para mi tienda '
+            . $store->name
+            . '. Ya realicé o quiero realizar el pago.';
+
+        return 'https://wa.me/' . config('vendefacil.payment_whatsapp')
+            . '?text=' . rawurlencode($message);
     }
 }

@@ -440,7 +440,7 @@
                                     <p
                                         class="mt-2 text-xs leading-5 text-[#9b8788]"
                                     >
-                                        Si solo vendes por internet, puedes dejar este campo vacío.
+                                        Si no haces delivery, este dato es obligatorio para que los clientes sepan dónde comprar.
                                     </p>
 
                                 </div>

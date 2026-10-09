@@ -13,6 +13,7 @@ composer dump-autoload --no-dev
 npm install
 npm run build
 php artisan optimize:clear
+php artisan migrate
 ```
 
 No subas `node_modules`. Si vas a subir por FTP desde la carpeta del proyecto, simplemente ignora esa carpeta.
@@ -27,6 +28,8 @@ En InfinityFree:
 4. En phpMyAdmin de InfinityFree importa una copia de tu base local.
 
 Como en InfinityFree no puedes ejecutar migraciones con `php artisan migrate`, debes importar la base ya creada.
+
+Si hiciste cambios nuevos como pagos, productos ilimitados o tiendas destacadas, primero ejecuta las migraciones en tu PC y luego vuelve a exportar/importar la base de datos completa en InfinityFree.
 
 ## 3. Archivo `.env`
 
@@ -98,7 +101,7 @@ VendeFacil usa `storage/app/public` para logos y productos. InfinityFree no sopo
 RewriteRule ^storage/(.*)$ /storage/app/public/$1 [END]
 ```
 
-Eso permite que URLs como `/storage/products/foto.jpg` carguen desde `storage/app/public/products/foto.jpg`.
+Eso permite que URLs como `/storage/products/foto.jpg` o `/storage/payment-proofs/comprobante.pdf` carguen desde `storage/app/public/...`.
 
 ## 6. Si sale error 500
 
@@ -121,6 +124,8 @@ Revisa en este orden:
 5. Prueba crear tienda.
 6. Prueba subir logo o producto.
 7. Prueba abrir la imagen subida desde `/storage/...`.
+8. Prueba subir un comprobante en `Plan y pagos`.
+9. Entra como admin a `Administración > Pagos` y aprueba el comprobante.
 
 ## 8. SEO después de publicar
 

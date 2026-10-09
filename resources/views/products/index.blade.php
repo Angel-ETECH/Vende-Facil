@@ -130,6 +130,89 @@
             @endif
 
 
+            @if (session('error'))
+
+                <div
+                    class="mt-6 flex items-start gap-3 rounded-[18px] border border-[#f3c5bc] bg-[#fff0ec] px-4 py-3 text-sm font-semibold text-[#a24536]"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        class="mt-0.5 h-5 w-5 flex-shrink-0"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 9v3.75m0 3h.008v.008H12v-.008ZM12 3.75a8.25 8.25 0 1 1 0 16.5 8.25 8.25 0 0 1 0-16.5Z"
+                        />
+                    </svg>
+
+                    {{ session('error') }}
+                </div>
+
+            @endif
+
+
+            <div
+                class="mt-6 overflow-hidden rounded-[24px] border border-[#eaded5] bg-white"
+            >
+                <div class="grid gap-4 p-5 lg:grid-cols-[1fr_auto] lg:items-center">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-[.12em] text-[#9b8583]">
+                            Plan de publicación
+                        </p>
+
+                        @if($store->unlimited_products)
+                            <h2 class="mt-2 text-xl font-black tracking-[-.03em] text-[#35272a]">
+                                Productos ilimitados activos
+                            </h2>
+
+                            <p class="mt-1 text-sm leading-6 text-[#806d70]">
+                                Esta tienda puede publicar productos sin límite.
+                            </p>
+                        @else
+                            <h2 class="mt-2 text-xl font-black tracking-[-.03em] text-[#35272a]">
+                                {{ $productCount }} de {{ $productLimit }} productos gratis usados
+                            </h2>
+
+                            <p class="mt-1 text-sm leading-6 text-[#806d70]">
+                                Te quedan {{ $remainingProductSlots }} publicaciones gratis. Luego puedes activar productos ilimitados por S/ {{ $planPrice }}.
+                            </p>
+                        @endif
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span class="rounded-full bg-[#fff3da] px-4 py-2 text-xs font-black text-[#806226]">
+                            Gratis: {{ $productLimit }}
+                        </span>
+
+                        <span class="rounded-full {{ $store->unlimited_products ? 'bg-[#e7f5ef] text-[#427764]' : 'bg-[#eef0f4] text-[#5f6978]' }} px-4 py-2 text-xs font-black">
+                            {{ $store->unlimited_products ? 'Ilimitado activo' : 'Ilimitado disponible' }}
+                        </span>
+
+                        @unless($store->unlimited_products)
+                            <a
+                                href="#plan-ilimitado"
+                                class="inline-flex items-center justify-center rounded-full bg-[#442d35] px-4 py-2 text-xs font-black text-white transition hover:bg-[#ff6b57]"
+                            >
+                                Activar productos ilimitados
+                            </a>
+                        @endunless
+                    </div>
+                </div>
+            </div>
+
+
+            @if(! $store->unlimited_products)
+                <div id="plan-ilimitado" class="mt-6 scroll-mt-24">
+                    @include('products.partials.upgrade-card')
+                </div>
+            @endif
+
+
             {{-- ================================================= --}}
             {{-- SIN PRODUCTOS --}}
             {{-- ================================================= --}}

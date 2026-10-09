@@ -283,6 +283,10 @@
                                         class="w-full rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3.5 text-[#3d3032] focus:border-[#ff8b78] focus:ring-[#ff8b78]"
                                     >
 
+                                    <p class="mt-2 text-xs leading-5 text-[#9b8788]">
+                                        Si no haces delivery, este dato es obligatorio para que los clientes sepan dónde comprar.
+                                    </p>
+
                                 </div>
 
 

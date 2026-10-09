@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PaymentProofController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WhatsappClickController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\PaymentProofAdminController;
 use App\Http\Controllers\Admin\StoreAdminController;
 
 
@@ -141,6 +143,16 @@ Route::middleware(['auth', 'verified', 'throttle:60,1'])->group(function () {
         '/productos/{product}',
         [ProductController::class, 'destroy']
     )->name('products.destroy');
+
+    Route::get(
+        '/pagos',
+        [PaymentProofController::class, 'index']
+    )->name('seller.payments.index');
+
+    Route::post(
+        '/pagos',
+        [PaymentProofController::class, 'store']
+    )->name('seller.payments.store');
 });
 
 Route::middleware(['auth', 'admin', 'throttle:40,1'])
@@ -157,8 +169,23 @@ Route::middleware(['auth', 'admin', 'throttle:40,1'])
         Route::patch('/tiendas/{store}/estado', [StoreAdminController::class, 'toggle'])
             ->name('stores.toggle');
 
+        Route::patch('/tiendas/{store}/productos-ilimitados', [StoreAdminController::class, 'toggleUnlimitedProducts'])
+            ->name('stores.unlimited-products');
+
+        Route::patch('/tiendas/{store}/destacada', [StoreAdminController::class, 'toggleFeatured'])
+            ->name('stores.featured');
+
         Route::delete('/tiendas/{store}', [StoreAdminController::class, 'destroy'])
             ->name('stores.destroy');
+
+        Route::get('/pagos', [PaymentProofAdminController::class, 'index'])
+            ->name('payments.index');
+
+        Route::patch('/pagos/{paymentProof}/aprobar', [PaymentProofAdminController::class, 'approve'])
+            ->name('payments.approve');
+
+        Route::patch('/pagos/{paymentProof}/rechazar', [PaymentProofAdminController::class, 'reject'])
+            ->name('payments.reject');
 
     });
 

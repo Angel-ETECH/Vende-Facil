@@ -9,6 +9,8 @@
         : asset(config('seo.image'));
 
     $storeUrl = route('stores.show', ['store' => $store->slug]);
+    $storeMapUrl = $store->mapUrl();
+    $storeMapEmbedUrl = $store->mapEmbedUrl();
 
     $storeSchema = [
         '@context' => 'https://schema.org',
@@ -181,6 +183,14 @@
 
                             </span>
 
+                            @if($store->isFeatured())
+                                <span
+                                    class="inline-flex items-center gap-2 rounded-full bg-[#fff3da] px-3 py-1.5 text-xs font-black text-[#806226]"
+                                >
+                                    Destacada
+                                </span>
+                            @endif
+
                         </div>
 
 
@@ -217,6 +227,17 @@
 
                         </div>
 
+                        @if($storeMapUrl)
+                            <a
+                                href="{{ $storeMapUrl }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="mt-3 inline-flex items-center gap-2 rounded-full bg-[#fff0db] px-4 py-2 text-xs font-black text-[#a36c53] transition hover:bg-[#ffe2bd]"
+                            >
+                                Ver ubicación en Google Maps
+                            </a>
+                        @endif
+
 
                         <div class="mt-3 flex flex-wrap gap-2">
                             <span
@@ -230,6 +251,14 @@
                             >
                                 {{ $store->delivery_available ? 'Hace delivery' : 'Sin delivery' }}
                             </span>
+
+                            @if(! $store->delivery_available && $storeMapUrl)
+                                <span
+                                    class="inline-flex rounded-full bg-[#eef4ff] px-3 py-1.5 text-xs font-black text-[#496d9d]"
+                                >
+                                    Compra en tienda física
+                                </span>
+                            @endif
                         </div>
 
 
@@ -320,6 +349,33 @@
 
                     </a>
 
+                    @if($storeMapUrl)
+                        <a
+                            href="{{ $storeMapUrl }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center justify-center gap-2 rounded-[20px] bg-[#fff3da] px-5 py-4 font-black text-[#806226] transition hover:bg-[#ffe9ba]"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.8"
+                                stroke="currentColor"
+                                class="h-5 w-5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 21s6.75-4.2 6.75-10.5a6.75 6.75 0 1 0-13.5 0C5.25 16.8 12 21 12 21Z"
+                                />
+                                <circle cx="12" cy="10.5" r="2"/>
+                            </svg>
+
+                            Cómo llegar
+                        </a>
+                    @endif
+
                 </div>
 
             </div>
@@ -329,6 +385,60 @@
     </div>
 
 </section>
+
+
+@if($storeMapEmbedUrl)
+    <section class="border-y border-[#ebded5] bg-[#fffaf2] py-12">
+        <div class="vf-container">
+            <div class="grid gap-6 lg:grid-cols-[.8fr_1.2fr] lg:items-stretch">
+                <div class="rounded-[30px] border border-[#eaded5] bg-white p-6 shadow-[0_16px_40px_rgba(91,53,43,.07)]">
+                    <span class="inline-flex rounded-full bg-[#fff3da] px-4 py-1.5 text-[11px] font-black uppercase tracking-[.13em] text-[#806226]">
+                        Ubicación
+                    </span>
+
+                    <h2 class="mt-4 text-2xl font-black tracking-[-.035em] text-[#35272a]">
+                        Visita {{ $store->name }}
+                    </h2>
+
+                    <p class="mt-3 text-sm leading-6 text-[#806d70]">
+                        {{ $store->delivery_available
+                            ? 'Puedes coordinar delivery o acercarte al negocio según lo que acuerdes por WhatsApp.'
+                            : 'Esta tienda no ofrece delivery por ahora, así que su ubicación ayuda a que puedas acercarte directamente.'
+                        }}
+                    </p>
+
+                    <div class="mt-5 rounded-[22px] bg-[#fff8f1] px-4 py-4">
+                        <p class="text-xs font-black uppercase tracking-[.1em] text-[#a08a89]">
+                            Dirección
+                        </p>
+                        <p class="mt-2 text-sm font-black leading-6 text-[#514043]">
+                            {{ $store->locationLabel() }}
+                        </p>
+                    </div>
+
+                    <a
+                        href="{{ $storeMapUrl }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-5 inline-flex w-full items-center justify-center rounded-[18px] bg-[#442d35] px-5 py-3.5 text-sm font-black text-white transition hover:bg-[#ff6b57]"
+                    >
+                        Abrir ruta en Google Maps
+                    </a>
+                </div>
+
+                <div class="overflow-hidden rounded-[30px] border border-[#eaded5] bg-white shadow-[0_16px_40px_rgba(91,53,43,.07)]">
+                    <iframe
+                        src="{{ $storeMapEmbedUrl }}"
+                        title="Mapa de {{ $store->name }}"
+                        class="h-[320px] w-full sm:h-[380px]"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+@endif
 
 
 {{-- ========================================================= --}}
