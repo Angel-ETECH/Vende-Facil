@@ -2,7 +2,7 @@
 
 @php
     $storeDescription = $store->description
-        ?: 'Explora el catálogo de '.$store->name.' y compra directamente por WhatsApp en VendeFácil.';
+        ?: 'Explora el catálogo de '.$store->name.' en '.($store->city ?: 'Perú').' y compra directamente por WhatsApp en VendeFácil.';
 
     $storeImage = $store->logo
         ? asset('storage/'.$store->logo)
@@ -11,6 +11,7 @@
     $storeUrl = route('stores.show', ['store' => $store->slug]);
     $storeMapUrl = $store->mapUrl();
     $storeMapEmbedUrl = $store->mapEmbedUrl();
+    $socialLinks = $store->socialLinks();
 
     $storeSchema = [
         '@context' => 'https://schema.org',
@@ -31,9 +32,17 @@
             'name' => 'Perú',
         ],
     ];
+
+    if ($storeMapUrl) {
+        $storeSchema['hasMap'] = $storeMapUrl;
+    }
+
+    if ($socialLinks) {
+        $storeSchema['sameAs'] = array_values($socialLinks);
+    }
 @endphp
 
-@section('title', $store->name . ' | Tienda en VendeFácil')
+@section('title', $store->name . ' en ' . ($store->city ?: 'Perú') . ' | VendeFácil')
 
 @section('description')
 {{ $storeDescription }}
@@ -191,6 +200,25 @@
                                 </span>
                             @endif
 
+                            @if($store->isVerified())
+                                <span
+                                    class="inline-flex items-center gap-2 rounded-full bg-[#e7f5ef] px-3 py-1.5 text-xs font-black text-[#427764]"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="2"
+                                        stroke="currentColor"
+                                        class="h-3.5 w-3.5"
+                                    >
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />
+                                    </svg>
+
+                                    Tienda verificada
+                                </span>
+                            @endif
+
                         </div>
 
 
@@ -259,7 +287,30 @@
                                     Compra en tienda física
                                 </span>
                             @endif
+
+                            @if($store->opening_hours)
+                                <span
+                                    class="inline-flex rounded-full bg-white px-3 py-1.5 text-xs font-black text-[#6f5b5e]"
+                                >
+                                    {{ $store->opening_hours }}
+                                </span>
+                            @endif
                         </div>
+
+                        @if($socialLinks)
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                @foreach($socialLinks as $label => $url)
+                                    <a
+                                        href="{{ $url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="inline-flex rounded-full border border-[#eaded5] bg-white px-3 py-1.5 text-xs font-black text-[#6f5b5e] transition hover:border-[#ffb7a9] hover:text-[#ff604c]"
+                                    >
+                                        {{ $label }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
 
 
                         {{-- DESCRIPCIÓN --}}
@@ -376,6 +427,26 @@
                         </a>
                     @endif
 
+                    <button
+                        type="button"
+                        x-data="{ copied: false, url: @js($storeUrl) }"
+                        @click="navigator.clipboard.writeText(url); copied = true; setTimeout(() => copied = false, 1800)"
+                        class="flex items-center justify-center gap-2 rounded-[20px] border border-[#eaded5] bg-white px-5 py-4 font-black text-[#6f5b5e] transition hover:bg-[#fff8f1]"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.8"
+                            stroke="currentColor"
+                            class="h-5 w-5"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5h-1.5A2.25 2.25 0 0 0 4.5 9.75v8.25A2.25 2.25 0 0 0 6.75 20.25h8.25A2.25 2.25 0 0 0 17.25 18v-1.5M9 3.75h9.75A1.5 1.5 0 0 1 20.25 5.25V15A1.5 1.5 0 0 1 18.75 16.5H9A1.5 1.5 0 0 1 7.5 15V5.25A1.5 1.5 0 0 1 9 3.75Z" />
+                        </svg>
+
+                        <span x-text="copied ? 'URL copiada' : 'Compartir tienda'"></span>
+                    </button>
+
                 </div>
 
             </div>
@@ -385,6 +456,40 @@
     </div>
 
 </section>
+
+
+@if(! empty($store->gallery_images))
+    <section class="border-y border-[#ebded5] bg-[#fffaf2] py-12">
+        <div class="vf-container">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <span class="inline-flex rounded-full bg-[#98dbc6] px-4 py-1.5 text-[11px] font-black uppercase tracking-[.13em] text-[#315c4d]">
+                        Confianza
+                    </span>
+
+                    <h2 class="mt-4 text-2xl font-black tracking-[-.035em] text-[#35272a]">
+                        Mira más de {{ $store->name }}
+                    </h2>
+                </div>
+
+                <p class="max-w-xl text-sm leading-6 text-[#806d70]">
+                    Fotos del local, ambiente o productos para que compres con más seguridad.
+                </p>
+            </div>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                @foreach($store->gallery_images as $galleryImage)
+                    <img
+                        src="{{ asset('storage/' . $galleryImage) }}"
+                        alt="Foto de {{ $store->name }}"
+                        class="h-56 w-full rounded-[26px] border border-[#eaded5] object-cover shadow-[0_12px_30px_rgba(91,53,43,.07)]"
+                        loading="lazy"
+                    >
+                @endforeach
+            </div>
+        </div>
+    </section>
+@endif
 
 
 @if($storeMapEmbedUrl)
@@ -458,6 +563,8 @@
             price: '',
             stock: 0,
             image: null,
+            galleryImages: [],
+            mapUrl: @js($storeMapUrl),
             whatsappUrl: '',
         },
         products: @js($products->map(fn ($product) => [
@@ -842,6 +949,8 @@
                                             price: @js('S/ ' . number_format($product->price, 2)),
                                             stock: {{ (int) $product->stock }},
                                             image: @js($product->image ? asset('storage/' . $product->image) : null),
+                                            galleryImages: @js(collect($product->gallery_images ?? [])->map(fn ($image) => asset('storage/' . $image))->values()),
+                                            mapUrl: @js($storeMapUrl),
                                             whatsappUrl: @js(route('products.whatsapp', [$store, $product])),
                                         })"
                                     >
@@ -883,6 +992,8 @@
                                             price: @js('S/ ' . number_format($product->price, 2)),
                                             stock: {{ (int) $product->stock }},
                                             image: @js($product->image ? asset('storage/' . $product->image) : null),
+                                            galleryImages: @js(collect($product->gallery_images ?? [])->map(fn ($image) => asset('storage/' . $image))->values()),
+                                            mapUrl: @js($storeMapUrl),
                                             whatsappUrl: @js(route('products.whatsapp', [$store, $product])),
                                         })"
                                     >
@@ -955,6 +1066,18 @@
 
                     <div class="p-6">
 
+                        <template x-if="selectedProduct.galleryImages.length">
+                            <div class="-mt-1 mb-5 grid grid-cols-3 gap-2">
+                                <template x-for="galleryImage in selectedProduct.galleryImages" :key="galleryImage">
+                                    <img
+                                        :src="galleryImage"
+                                        alt="Foto extra del producto"
+                                        class="h-20 w-full rounded-[16px] object-cover"
+                                    >
+                                </template>
+                            </div>
+                        </template>
+
                         <div class="flex items-start justify-between gap-4">
 
                             <div class="min-w-0">
@@ -1021,6 +1144,17 @@
                             >
                                 Pedir por WhatsApp
                             </a>
+
+                            <template x-if="selectedProduct.mapUrl">
+                                <a
+                                    :href="selectedProduct.mapUrl"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="inline-flex h-12 items-center justify-center rounded-[16px] bg-[#fff3da] px-5 text-sm font-black text-[#806226] transition hover:bg-[#ffe9ba] sm:col-span-2"
+                                >
+                                    Ver ubicación de la tienda
+                                </a>
+                            </template>
                         </div>
 
                     </div>

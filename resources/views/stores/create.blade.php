@@ -446,6 +446,80 @@
                                 </div>
 
 
+                                {{-- UBICACIÓN EXACTA --}}
+                                <div>
+
+                                    <label
+                                        for="location_url"
+                                        class="mb-2 block text-sm font-black text-[#514043]"
+                                    >
+                                        Enlace de Google Maps
+                                    </label>
+
+                                    <input
+                                        id="location_url"
+                                        type="url"
+                                        name="location_url"
+                                        value="{{ old('location_url') }}"
+                                        placeholder="Pega aquí el enlace de tu ubicación exacta"
+                                        class="w-full rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3.5 text-[#3d3032] placeholder:text-[#b7a3a0] focus:border-[#ff8b78] focus:ring-[#ff8b78]"
+                                    >
+
+                                    <p class="mt-2 text-xs leading-5 text-[#9b8788]">
+                                        Copia el enlace desde Google Maps para que tus clientes puedan tocar “Cómo llegar”.
+                                    </p>
+
+                                </div>
+
+
+                                {{-- HORARIOS --}}
+                                <div>
+
+                                    <label
+                                        for="opening_hours"
+                                        class="mb-2 block text-sm font-black text-[#514043]"
+                                    >
+                                        Horario de atención
+                                    </label>
+
+                                    <input
+                                        id="opening_hours"
+                                        type="text"
+                                        name="opening_hours"
+                                        value="{{ old('opening_hours') }}"
+                                        placeholder="Ej. Lun a sáb, 9:00 a. m. - 8:00 p. m."
+                                        class="w-full rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3.5 text-[#3d3032] placeholder:text-[#b7a3a0] focus:border-[#ff8b78] focus:ring-[#ff8b78]"
+                                    >
+
+                                </div>
+
+
+                                {{-- REDES --}}
+                                <div class="grid gap-5 sm:grid-cols-2">
+
+                                    <div>
+                                        <label for="facebook_url" class="mb-2 block text-sm font-black text-[#514043]">Facebook</label>
+                                        <input id="facebook_url" type="url" name="facebook_url" value="{{ old('facebook_url') }}" placeholder="https://facebook.com/tu-tienda" class="w-full rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3.5 text-[#3d3032] placeholder:text-[#b7a3a0] focus:border-[#ff8b78] focus:ring-[#ff8b78]">
+                                    </div>
+
+                                    <div>
+                                        <label for="instagram_url" class="mb-2 block text-sm font-black text-[#514043]">Instagram</label>
+                                        <input id="instagram_url" type="url" name="instagram_url" value="{{ old('instagram_url') }}" placeholder="https://instagram.com/tu-tienda" class="w-full rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3.5 text-[#3d3032] placeholder:text-[#b7a3a0] focus:border-[#ff8b78] focus:ring-[#ff8b78]">
+                                    </div>
+
+                                    <div>
+                                        <label for="tiktok_url" class="mb-2 block text-sm font-black text-[#514043]">TikTok</label>
+                                        <input id="tiktok_url" type="url" name="tiktok_url" value="{{ old('tiktok_url') }}" placeholder="https://www.tiktok.com/@tu-tienda" class="w-full rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3.5 text-[#3d3032] placeholder:text-[#b7a3a0] focus:border-[#ff8b78] focus:ring-[#ff8b78]">
+                                    </div>
+
+                                    <div>
+                                        <label for="website_url" class="mb-2 block text-sm font-black text-[#514043]">Página web</label>
+                                        <input id="website_url" type="url" name="website_url" value="{{ old('website_url') }}" placeholder="https://tu-dominio.com" class="w-full rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3.5 text-[#3d3032] placeholder:text-[#b7a3a0] focus:border-[#ff8b78] focus:ring-[#ff8b78]">
+                                    </div>
+
+                                </div>
+
+
                                 {{-- DELIVERY --}}
                                 <div
                                     class="rounded-[18px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-4"
@@ -471,6 +545,40 @@
                                         </span>
                                     </label>
 
+                                </div>
+
+
+                                {{-- GALERÍA --}}
+                                <div x-data="{ galleryCount: 0 }">
+                                    <label
+                                        for="store_gallery_images"
+                                        class="mb-2 block text-sm font-black text-[#514043]"
+                                    >
+                                        Fotos extra de la tienda
+                                    </label>
+                                    <label
+                                        for="store_gallery_images"
+                                        class="flex cursor-pointer items-center justify-between gap-3 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3 text-sm font-bold text-[#514043] shadow-sm transition hover:border-[#ff6a5c] hover:bg-white focus-within:border-[#ff6a5c] focus-within:ring-4 focus-within:ring-[#ff6a5c]/15"
+                                    >
+                                        <span class="min-w-0 truncate" x-text="galleryCount ? `${galleryCount} foto(s) seleccionada(s)` : 'Seleccionar fotos extra'"></span>
+                                        <span class="shrink-0 rounded-full bg-[#442d35] px-4 py-2 text-xs font-black text-white">
+                                            Elegir
+                                        </span>
+                                    </label>
+
+                                    <input
+                                        id="store_gallery_images"
+                                        type="file"
+                                        name="gallery_images[]"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        multiple
+                                        class="sr-only"
+                                        @change="galleryCount = $event.target.files.length"
+                                    >
+
+                                    <p class="mt-2 text-xs leading-5 text-[#9b8788]">
+                                        Puedes subir hasta 6 fotos del local, fachada o ambiente. JPG, PNG o WEBP.
+                                    </p>
                                 </div>
 
                             </div>

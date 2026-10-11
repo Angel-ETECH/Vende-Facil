@@ -6,9 +6,41 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Store;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
+    public function category(Category $category, Request $request)
+    {
+        $request->merge([
+            'categoria' => $category->slug,
+        ]);
+
+        $request->attributes->set('seo_context', 'category');
+
+        return $this->index($request);
+    }
+
+    public function city(string $citySlug, Request $request)
+    {
+        $city = Store::query()
+            ->where('active', true)
+            ->whereNotNull('city')
+            ->where('city', '!=', '')
+            ->pluck('city')
+            ->first(fn (string $cityName) => Str::slug($cityName) === $citySlug);
+
+        abort_unless($city, 404);
+
+        $request->merge([
+            'ciudad' => $city,
+        ]);
+
+        $request->attributes->set('seo_context', 'city');
+
+        return $this->index($request);
+    }
+
     public function index(Request $request)
     {
         /*
@@ -272,6 +304,33 @@ class HomeController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | SEO DE LA PÁGINA ACTUAL
+        |--------------------------------------------------------------------------
+        */
+
+        $seoContext = $request->attributes->get('seo_context');
+
+        $pageTitle = 'VendeFácil | Marketplace de negocios locales en Perú';
+
+        $pageDescription = 'Encuentra tiendas independientes, productos únicos y negocios locales con delivery en Perú. Compra directo por WhatsApp en VendeFácil.';
+
+        $canonicalUrl = route('home');
+
+        if ($seoContext === 'category' && $selectedCategory) {
+            $pageTitle = $selectedCategory->name . ' en Perú | VendeFácil';
+            $pageDescription = 'Descubre productos de ' . $selectedCategory->name . ' publicados por negocios locales en VendeFácil y compra directo por WhatsApp.';
+            $canonicalUrl = route('categories.show', ['category' => $selectedCategory->slug]);
+        }
+
+        if ($seoContext === 'city' && $city !== '') {
+            $pageTitle = 'Tiendas en ' . $city . ' | VendeFácil';
+            $pageDescription = 'Encuentra tiendas, productos y negocios locales en ' . $city . ' con contacto directo por WhatsApp en VendeFácil.';
+            $canonicalUrl = route('cities.show', ['citySlug' => Str::slug($city)]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
         | DEVOLVER HOME
         |--------------------------------------------------------------------------
         */
@@ -288,7 +347,10 @@ class HomeController extends Controller
             'stores',
             'storesCount',
             'productsCount',
-            'search'
+            'search',
+            'pageTitle',
+            'pageDescription',
+            'canonicalUrl'
         ));
     }
 }

@@ -478,6 +478,64 @@
                                 class="hidden"
                             >
 
+                            <div class="mt-5">
+                                <label
+                                    for="gallery_images"
+                                    class="mb-2 block text-sm font-black text-[#514043]"
+                                >
+                                    Fotos extra
+                                </label>
+
+                                @if(! empty($product->gallery_images))
+                                    <div class="mb-4 grid grid-cols-2 gap-3">
+                                        @foreach($product->gallery_images as $galleryImage)
+                                            <label class="overflow-hidden rounded-[18px] border border-[#eaded5] bg-[#fffdf9]">
+                                                <img
+                                                    src="{{ asset('storage/' . $galleryImage) }}"
+                                                    alt="Foto extra de {{ $product->name }}"
+                                                    class="h-24 w-full object-cover"
+                                                >
+                                                <span class="flex items-center gap-2 px-3 py-2 text-xs font-bold text-[#806d70]">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="remove_gallery_images[]"
+                                                        value="{{ $galleryImage }}"
+                                                        class="rounded border-[#d8c8bf] text-[#ff6b57] focus:ring-[#ff8b78]"
+                                                    >
+                                                    Quitar
+                                                </span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <div x-data="{ galleryCount: 0 }">
+                                    <label
+                                        for="product_gallery_images"
+                                        class="flex cursor-pointer items-center justify-between gap-3 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3 text-sm font-bold text-[#514043] shadow-sm transition hover:border-[#ff6a5c] hover:bg-white focus-within:border-[#ff6a5c] focus-within:ring-4 focus-within:ring-[#ff6a5c]/15"
+                                    >
+                                        <span class="min-w-0 truncate" x-text="galleryCount ? `${galleryCount} foto(s) seleccionada(s)` : 'Agregar fotos extra'"></span>
+                                        <span class="shrink-0 rounded-full bg-[#442d35] px-4 py-2 text-xs font-black text-white">
+                                            Elegir
+                                        </span>
+                                    </label>
+
+                                    <input
+                                        id="product_gallery_images"
+                                        type="file"
+                                        name="gallery_images[]"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        multiple
+                                        class="sr-only"
+                                        @change="galleryCount = $event.target.files.length"
+                                    >
+                                </div>
+
+                                <p class="mt-2 text-xs leading-5 text-[#9b8788]">
+                                    Conserva, quita o agrega fotos extra para este producto.
+                                </p>
+                            </div>
+
                         </div>
 
 

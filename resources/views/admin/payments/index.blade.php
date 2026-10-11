@@ -63,20 +63,76 @@
 
             <form method="GET" action="{{ route('admin.payments.index') }}" class="mt-6 rounded-[24px] border border-[#eaded5] bg-white p-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                    <label class="block">
-                        <span class="mb-2 block text-xs font-black uppercase tracking-[.1em] text-[#9b8583]">
+                    @php
+                        $paymentStatusOptions = [
+                            ['value' => 'pending', 'label' => 'Pendientes'],
+                            ['value' => 'approved', 'label' => 'Aprobados'],
+                            ['value' => 'rejected', 'label' => 'Rechazados'],
+                            ['value' => 'todos', 'label' => 'Todos'],
+                        ];
+                    @endphp
+
+                    <div
+                        x-data="{
+                            open: false,
+                            selected: @js($status),
+                            options: @js($paymentStatusOptions),
+                            get label() {
+                                return this.options.find((option) => option.value === this.selected)?.label || 'Pendientes';
+                            },
+                            choose(value) {
+                                this.selected = value;
+                                this.open = false;
+                            },
+                        }"
+                        @click.outside="open = false"
+                        class="relative block w-full sm:w-64"
+                    >
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[.1em] text-[#9b8583]">
                             Estado
-                        </span>
-                        <select
-                            name="estado"
-                            class="h-12 rounded-[16px] border-[#eaded5] bg-[#fffdf9] text-sm font-bold text-[#514043] focus:border-[#ff8b78] focus:ring-[#ff8b78]/25"
+                        </label>
+
+                        <input type="hidden" name="estado" :value="selected">
+
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            class="flex h-12 w-full items-center justify-between gap-3 rounded-[16px] border border-[#eaded5] bg-[#fffdf9] px-4 text-left text-sm font-black text-[#514043] shadow-sm transition hover:border-[#ffd2c8] hover:bg-white focus:border-[#ff8b78] focus:outline-none focus:ring-2 focus:ring-[#ff8b78]/25"
                         >
-                            <option value="pending" @selected($status === 'pending')>Pendientes</option>
-                            <option value="approved" @selected($status === 'approved')>Aprobados</option>
-                            <option value="rejected" @selected($status === 'rejected')>Rechazados</option>
-                            <option value="todos" @selected($status === 'todos')>Todos</option>
-                        </select>
-                    </label>
+                            <span x-text="label"></span>
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                class="h-4 w-4 text-[#7e6a6d] transition"
+                                :class="{ 'rotate-180': open }"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div
+                            x-show="open"
+                            x-cloak
+                            x-transition.origin.top
+                            class="absolute left-0 right-0 z-40 mt-2 overflow-hidden rounded-[18px] border border-[#eaded5] bg-white p-2 shadow-[0_18px_45px_rgba(91,53,43,.16)]"
+                        >
+                            <template x-for="option in options" :key="option.value">
+                                <button
+                                    type="button"
+                                    @click="choose(option.value)"
+                                    class="flex w-full items-center justify-between rounded-[14px] px-4 py-3 text-left text-sm font-black transition hover:bg-[#fff3e8]"
+                                    :class="selected === option.value ? 'bg-[#ff6b57] text-white' : 'text-[#4b3a3d]'"
+                                >
+                                    <span x-text="option.label"></span>
+                                    <span x-show="selected === option.value">✓</span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
 
                     <button
                         type="submit"

@@ -468,6 +468,38 @@
                                 class="hidden"
                             >
 
+                            <div class="mt-5" x-data="{ galleryCount: 0 }">
+                                <label
+                                    for="product_gallery_images"
+                                    class="mb-2 block text-sm font-black text-[#514043]"
+                                >
+                                    Fotos extra
+                                </label>
+                                <label
+                                    for="product_gallery_images"
+                                    class="flex cursor-pointer items-center justify-between gap-3 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 py-3 text-sm font-bold text-[#514043] shadow-sm transition hover:border-[#ff6a5c] hover:bg-white focus-within:border-[#ff6a5c] focus-within:ring-4 focus-within:ring-[#ff6a5c]/15"
+                                >
+                                    <span class="min-w-0 truncate" x-text="galleryCount ? `${galleryCount} foto(s) seleccionada(s)` : 'Seleccionar fotos extra'"></span>
+                                    <span class="shrink-0 rounded-full bg-[#442d35] px-4 py-2 text-xs font-black text-white">
+                                        Elegir
+                                    </span>
+                                </label>
+
+                                <input
+                                    id="product_gallery_images"
+                                    type="file"
+                                    name="gallery_images[]"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    multiple
+                                    class="sr-only"
+                                    @change="galleryCount = $event.target.files.length"
+                                >
+
+                                <p class="mt-2 text-xs leading-5 text-[#9b8788]">
+                                    Añade hasta 6 fotos más para que el cliente vea mejor el producto.
+                                </p>
+                            </div>
+
                         </div>
 
 

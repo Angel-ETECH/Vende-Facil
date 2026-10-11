@@ -1,12 +1,12 @@
 @extends('layouts.public')
 
-@section('title', 'VendeFácil | Marketplace de negocios locales en Perú')
+@section('title', $pageTitle ?? 'VendeFácil | Marketplace de negocios locales en Perú')
 
 @section('description')
-Encuentra tiendas independientes, productos únicos y negocios locales con delivery en Perú. Compra directo por WhatsApp en VendeFácil.
+{{ $pageDescription ?? 'Encuentra tiendas independientes, productos únicos y negocios locales con delivery en Perú. Compra directo por WhatsApp en VendeFácil.' }}
 @endsection
 
-@section('canonical', route('home'))
+@section('canonical', $canonicalUrl ?? route('home'))
 
 @section('image', asset('images/seo/vendefacil-home.png'))
 
@@ -298,8 +298,8 @@ Encuentra tiendas independientes, productos únicos y negocios locales con deliv
                     @foreach($categories as $category)
 
                         <a
-                            href="{{ route('home', array_filter([
-                                'categoria' => $category->slug,
+                            href="{{ route('categories.show', array_filter([
+                                'category' => $category->slug,
                                 'buscar' => $search ?: null,
                                 'ciudad' => $city ?: null,
                                 'delivery' => $delivery ? 1 : null,
@@ -1296,6 +1296,14 @@ Encuentra tiendas independientes, productos únicos y negocios locales con deliv
                                     class="absolute left-5 top-5 rounded-full bg-[#ffd66b] px-3 py-1.5 text-xs font-black text-[#4e3b20] shadow-sm"
                                 >
                                     Destacada
+                                </div>
+                            @endif
+
+                            @if($store->isVerified())
+                                <div
+                                    class="absolute bottom-5 left-5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-black text-[#427764] shadow-sm backdrop-blur"
+                                >
+                                    Verificada
                                 </div>
                             @endif
 

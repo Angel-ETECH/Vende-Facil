@@ -59,13 +59,13 @@ class PaymentProofController extends Controller
 
         if ($store->hasUnlimitedProducts()) {
             return redirect()
-                ->route('seller.payments.index')
+                ->route('seller.plan.index')
                 ->with('success', 'Tu tienda ya tiene productos ilimitados activos.');
         }
 
         if ($store->paymentProofs()->where('status', PaymentProof::STATUS_PENDING)->exists()) {
             return redirect()
-                ->route('seller.payments.index')
+                ->route('seller.plan.index')
                 ->with('error', 'Ya tienes un comprobante pendiente de revisión.');
         }
 
@@ -90,7 +90,7 @@ class PaymentProofController extends Controller
         ]);
 
         return redirect()
-            ->route('seller.payments.index')
+            ->route('seller.plan.index')
             ->with('success', 'Comprobante enviado. El administrador lo revisará para activar el plan.');
     }
 

@@ -78,10 +78,10 @@
 
             <div class="mt-4 grid gap-3">
                 <a
-                    href="{{ route('seller.payments.index') }}"
+                    href="{{ route('seller.plan.index') }}"
                     class="inline-flex w-full items-center justify-center rounded-[16px] bg-[#442d35] px-5 py-3.5 text-sm font-black text-white transition hover:bg-[#ff6b57]"
                 >
-                    Subir comprobante en el panel
+                    Desbloquear ilimitado
                 </a>
 
                 <a

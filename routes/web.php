@@ -8,6 +8,7 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\WhatsappClickController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\PaymentProofAdminController;
 use App\Http\Controllers\Admin\StoreAdminController;
 
@@ -26,6 +27,12 @@ Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])
 
 Route::get('/robots.txt', [SitemapController::class, 'robots'])
     ->name('seo.robots');
+
+Route::get('/categoria/{category:slug}', [HomeController::class, 'category'])
+    ->name('categories.show');
+
+Route::get('/ciudad/{citySlug}', [HomeController::class, 'city'])
+    ->name('cities.show');
 
 
 /*
@@ -145,6 +152,11 @@ Route::middleware(['auth', 'verified', 'throttle:60,1'])->group(function () {
     )->name('products.destroy');
 
     Route::get(
+        '/mi-plan',
+        [PaymentProofController::class, 'index']
+    )->name('seller.plan.index');
+
+    Route::get(
         '/pagos',
         [PaymentProofController::class, 'index']
     )->name('seller.payments.index');
@@ -160,6 +172,12 @@ Route::middleware(['auth', 'admin', 'throttle:40,1'])
     ->name('admin.')
     ->group(function () {
 
+        Route::get('/', [AdminDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        Route::get('/ganancias', [AdminDashboardController::class, 'index'])
+            ->name('earnings');
+
         Route::get('/tiendas', [StoreAdminController::class, 'index'])
             ->name('stores.index');
 
@@ -174,6 +192,9 @@ Route::middleware(['auth', 'admin', 'throttle:40,1'])
 
         Route::patch('/tiendas/{store}/destacada', [StoreAdminController::class, 'toggleFeatured'])
             ->name('stores.featured');
+
+        Route::patch('/tiendas/{store}/verificada', [StoreAdminController::class, 'toggleVerified'])
+            ->name('stores.verified');
 
         Route::delete('/tiendas/{store}', [StoreAdminController::class, 'destroy'])
             ->name('stores.destroy');

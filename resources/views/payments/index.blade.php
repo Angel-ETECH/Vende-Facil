@@ -3,14 +3,20 @@
     <div class="min-h-screen bg-[#fffaf5]">
         <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
+            @php
+                $planUsagePercent = $store->unlimited_products
+                    ? 100
+                    : min(100, $productLimit > 0 ? round(($productCount / $productLimit) * 100) : 0);
+            @endphp
+
             <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <div class="inline-flex items-center gap-2 rounded-full bg-[#ffe3a3] px-4 py-2 text-xs font-black uppercase tracking-[.12em] text-[#72581f]">
-                        Plan y pagos
+                        Mi plan
                     </div>
 
                     <h1 class="mt-4 text-3xl font-black tracking-[-.04em] text-[#35272a] sm:text-4xl">
-                        Productos ilimitados
+                        Plan de tu tienda
                     </h1>
 
                     <p class="mt-2 max-w-2xl text-base leading-7 text-[#806d70]">
@@ -88,6 +94,31 @@
                                 <p class="text-xs font-black uppercase tracking-[.08em] text-[#427764]">Plan</p>
                                 <p class="mt-1 text-2xl font-black text-[#315c4d]">S/ {{ $planPrice }}</p>
                             </div>
+                        </div>
+
+                        <div class="mt-6 rounded-[22px] border border-[#eaded5] bg-[#fffdf9] p-5">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-sm font-black text-[#35272a]">
+                                    Uso del plan gratis
+                                </p>
+
+                                <span class="text-sm font-black text-[#ff604c]">
+                                    {{ $store->unlimited_products ? 'Ilimitado' : $planUsagePercent . '%' }}
+                                </span>
+                            </div>
+
+                            <div class="mt-3 h-3 overflow-hidden rounded-full bg-[#f1e4db]">
+                                <div
+                                    class="h-full rounded-full {{ $remainingProductSlots <= 2 && ! $store->unlimited_products ? 'bg-[#ff6b57]' : 'bg-[#98dbc6]' }}"
+                                    style="width: {{ $planUsagePercent }}%"
+                                ></div>
+                            </div>
+
+                            @if(! $store->unlimited_products && $remainingProductSlots <= 2)
+                                <p class="mt-3 rounded-[16px] bg-[#fff3da] px-4 py-3 text-sm font-black text-[#806226]">
+                                    Te quedan {{ $remainingProductSlots }} productos gratis. Puedes desbloquear ilimitado antes de llegar al límite.
+                                </p>
+                            @endif
                         </div>
 
                         <div class="mt-6 rounded-[22px] border border-[#eaded5] bg-[#fffdf9] p-5">
@@ -298,16 +329,26 @@
                                 @enderror
                             </div>
 
-                            <div>
+                            <div x-data="{ proofName: '' }">
                                 <label for="proof" class="block text-xs font-black uppercase tracking-[.1em] text-[#9b8583]">
                                     Comprobante
+                                </label>
+                                <label
+                                    for="proof"
+                                    class="mt-2 flex cursor-pointer items-center justify-between gap-3 rounded-[16px] border border-[#eaded5] bg-[#fffdf9] px-4 py-3 text-sm font-bold text-[#514043] shadow-sm transition hover:border-[#ff6a5c] hover:bg-white focus-within:border-[#ff6a5c] focus-within:ring-4 focus-within:ring-[#ff6a5c]/15"
+                                >
+                                    <span class="min-w-0 truncate" x-text="proofName || 'Seleccionar comprobante'"></span>
+                                    <span class="shrink-0 rounded-full bg-[#442d35] px-4 py-2 text-xs font-black text-white">
+                                        Elegir
+                                    </span>
                                 </label>
                                 <input
                                     id="proof"
                                     name="proof"
                                     type="file"
                                     accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
-                                    class="mt-2 block w-full rounded-[16px] border border-[#eaded5] bg-[#fffdf9] px-4 py-3 text-sm font-bold text-[#514043] file:mr-4 file:rounded-full file:border-0 file:bg-[#442d35] file:px-4 file:py-2 file:text-sm file:font-black file:text-white"
+                                    class="sr-only"
+                                    @change="proofName = $event.target.files[0]?.name || ''"
                                     required
                                 >
                                 <p class="mt-2 text-xs leading-5 text-[#927e80]">

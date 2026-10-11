@@ -17,6 +17,7 @@ class Product extends Model
         'price',
         'stock',
         'image',
+        'gallery_images',
     ];
 
     protected function casts(): array
@@ -24,6 +25,7 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'active' => 'boolean',
+            'gallery_images' => 'array',
         ];
     }
 

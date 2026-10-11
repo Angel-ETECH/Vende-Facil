@@ -276,6 +276,12 @@
                                     Te quedan {{ $remainingProductSlots }} productos gratis. El plan ilimitado cuesta S/ {{ $planPrice }}.
                                 @endif
                             </p>
+
+                            @if(! $store->unlimited_products && $remainingProductSlots <= 2)
+                                <div class="mt-3 rounded-[18px] bg-[#fff3da] px-4 py-3 text-sm font-black text-[#806226]">
+                                    Estás cerca del límite gratis. Puedes activar ilimitado desde Mi plan cuando quieras.
+                                </div>
+                            @endif
                         </div>
 
                         <div class="flex flex-wrap gap-2">
@@ -288,10 +294,10 @@
 
                             @unless($store->unlimited_products)
                                 <a
-                                    href="{{ route('seller.payments.index') }}"
+                                    href="{{ route('seller.plan.index') }}"
                                     class="inline-flex items-center justify-center rounded-full bg-[#fff3da] px-5 py-3 text-sm font-black text-[#806226] transition hover:bg-[#ffe9ba]"
                                 >
-                                    Subir comprobante
+                                    Desbloquear ilimitado
                                 </a>
                             @endunless
                         </div>

@@ -138,7 +138,7 @@
             {{-- ================================================= --}}
 
             <div
-                class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
+                class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7"
             >
 
                 {{-- TOTAL TIENDAS --}}
@@ -322,6 +322,50 @@
                 </div>
 
 
+                {{-- VERIFICADAS --}}
+                <div
+                    class="rounded-[24px] border border-[#eaded5] bg-white p-5"
+                >
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-sm font-bold text-[#8e797b]">
+                                Verificadas
+                            </p>
+
+                            <p class="mt-1 text-3xl font-black text-[#35272a]">
+                                {{ $verifiedStores }}
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e7f5ef] text-[#427764]"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                class="h-6 w-6"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="m5 12 4 4L19 6"
+                                />
+                            </svg>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
                 {{-- PAGOS PENDIENTES --}}
                 <a
                     href="{{ route('admin.payments.index') }}"
@@ -461,54 +505,204 @@
 
                     </div>
 
+                    @php
+                        $cityFilterOptions = collect([
+                            ['value' => '', 'label' => 'Todas las ciudades'],
+                        ])->merge(
+                            $cities->map(fn ($filterCity) => [
+                                'value' => $filterCity,
+                                'label' => $filterCity,
+                            ])
+                        )->values();
 
-                    <select
-                        name="ciudad"
-                        class="h-14 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 text-sm font-black text-[#514043] focus:border-[#ff8b78] focus:ring-[#ff8b78]"
+                        $statusFilterOptions = [
+                            ['value' => 'todos', 'label' => 'Todos los estados'],
+                            ['value' => 'activa', 'label' => 'Activas'],
+                            ['value' => 'inactiva', 'label' => 'Inactivas'],
+                        ];
+
+                        $deliveryFilterOptions = [
+                            ['value' => 'todos', 'label' => 'Todo delivery'],
+                            ['value' => 'si', 'label' => 'Con delivery'],
+                            ['value' => 'no', 'label' => 'Sin delivery'],
+                        ];
+                    @endphp
+
+                    <div
+                        x-data="{
+                            open: false,
+                            selected: @js($city),
+                            options: @js($cityFilterOptions),
+                            get label() {
+                                return this.options.find((option) => option.value === this.selected)?.label || 'Todas las ciudades';
+                            },
+                            choose(value) {
+                                this.selected = value;
+                                this.open = false;
+                            },
+                        }"
+                        @click.outside="open = false"
+                        class="relative"
                     >
-                        <option value="">Todas las ciudades</option>
+                        <input type="hidden" name="ciudad" :value="selected">
 
-                        @foreach($cities as $filterCity)
-                            <option
-                                value="{{ $filterCity }}"
-                                @selected($city === $filterCity)
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            class="flex h-14 w-full items-center justify-between gap-3 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 text-left text-sm font-black text-[#514043] shadow-sm transition hover:border-[#ffd2c8] hover:bg-white focus:border-[#ff8b78] focus:outline-none focus:ring-2 focus:ring-[#ff8b78]/25"
+                        >
+                            <span class="truncate" x-text="label"></span>
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                class="h-4 w-4 flex-shrink-0 text-[#7e6a6d] transition"
+                                :class="{ 'rotate-180': open }"
                             >
-                                {{ $filterCity }}
-                            </option>
-                        @endforeach
-                    </select>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div
+                            x-show="open"
+                            x-cloak
+                            x-transition.origin.top
+                            class="absolute left-0 right-0 z-40 mt-2 max-h-72 overflow-y-auto rounded-[18px] border border-[#eaded5] bg-white p-2 shadow-[0_18px_45px_rgba(91,53,43,.16)]"
+                        >
+                            <template x-for="option in options" :key="option.value">
+                                <button
+                                    type="button"
+                                    @click="choose(option.value)"
+                                    class="flex w-full items-center justify-between rounded-[14px] px-4 py-3 text-left text-sm font-black transition hover:bg-[#fff3e8]"
+                                    :class="selected === option.value ? 'bg-[#ff6b57] text-white' : 'text-[#4b3a3d]'"
+                                >
+                                    <span class="truncate" x-text="option.label"></span>
+                                    <span x-show="selected === option.value">✓</span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
 
 
-                    <select
-                        name="estado"
-                        class="h-14 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 text-sm font-black text-[#514043] focus:border-[#ff8b78] focus:ring-[#ff8b78]"
+                    <div
+                        x-data="{
+                            open: false,
+                            selected: @js($status),
+                            options: @js($statusFilterOptions),
+                            get label() {
+                                return this.options.find((option) => option.value === this.selected)?.label || 'Todos los estados';
+                            },
+                            choose(value) {
+                                this.selected = value;
+                                this.open = false;
+                            },
+                        }"
+                        @click.outside="open = false"
+                        class="relative"
                     >
-                        <option value="todos" @selected($status === 'todos')>
-                            Todos los estados
-                        </option>
-                        <option value="activa" @selected($status === 'activa')>
-                            Activas
-                        </option>
-                        <option value="inactiva" @selected($status === 'inactiva')>
-                            Inactivas
-                        </option>
-                    </select>
+                        <input type="hidden" name="estado" :value="selected">
+
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            class="flex h-14 w-full items-center justify-between gap-3 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 text-left text-sm font-black text-[#514043] shadow-sm transition hover:border-[#ffd2c8] hover:bg-white focus:border-[#ff8b78] focus:outline-none focus:ring-2 focus:ring-[#ff8b78]/25"
+                        >
+                            <span x-text="label"></span>
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                class="h-4 w-4 flex-shrink-0 text-[#7e6a6d] transition"
+                                :class="{ 'rotate-180': open }"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div
+                            x-show="open"
+                            x-cloak
+                            x-transition.origin.top
+                            class="absolute left-0 right-0 z-40 mt-2 overflow-hidden rounded-[18px] border border-[#eaded5] bg-white p-2 shadow-[0_18px_45px_rgba(91,53,43,.16)]"
+                        >
+                            <template x-for="option in options" :key="option.value">
+                                <button
+                                    type="button"
+                                    @click="choose(option.value)"
+                                    class="flex w-full items-center justify-between rounded-[14px] px-4 py-3 text-left text-sm font-black transition hover:bg-[#fff3e8]"
+                                    :class="selected === option.value ? 'bg-[#ff6b57] text-white' : 'text-[#4b3a3d]'"
+                                >
+                                    <span x-text="option.label"></span>
+                                    <span x-show="selected === option.value">✓</span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
 
 
-                    <select
-                        name="delivery"
-                        class="h-14 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 text-sm font-black text-[#514043] focus:border-[#ff8b78] focus:ring-[#ff8b78]"
+                    <div
+                        x-data="{
+                            open: false,
+                            selected: @js($delivery),
+                            options: @js($deliveryFilterOptions),
+                            get label() {
+                                return this.options.find((option) => option.value === this.selected)?.label || 'Todo delivery';
+                            },
+                            choose(value) {
+                                this.selected = value;
+                                this.open = false;
+                            },
+                        }"
+                        @click.outside="open = false"
+                        class="relative"
                     >
-                        <option value="todos" @selected($delivery === 'todos')>
-                            Todo delivery
-                        </option>
-                        <option value="si" @selected($delivery === 'si')>
-                            Con delivery
-                        </option>
-                        <option value="no" @selected($delivery === 'no')>
-                            Sin delivery
-                        </option>
-                    </select>
+                        <input type="hidden" name="delivery" :value="selected">
+
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            class="flex h-14 w-full items-center justify-between gap-3 rounded-[16px] border border-[#e4d6cd] bg-[#fffdf9] px-4 text-left text-sm font-black text-[#514043] shadow-sm transition hover:border-[#ffd2c8] hover:bg-white focus:border-[#ff8b78] focus:outline-none focus:ring-2 focus:ring-[#ff8b78]/25"
+                        >
+                            <span x-text="label"></span>
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                class="h-4 w-4 flex-shrink-0 text-[#7e6a6d] transition"
+                                :class="{ 'rotate-180': open }"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div
+                            x-show="open"
+                            x-cloak
+                            x-transition.origin.top
+                            class="absolute left-0 right-0 z-40 mt-2 overflow-hidden rounded-[18px] border border-[#eaded5] bg-white p-2 shadow-[0_18px_45px_rgba(91,53,43,.16)]"
+                        >
+                            <template x-for="option in options" :key="option.value">
+                                <button
+                                    type="button"
+                                    @click="choose(option.value)"
+                                    class="flex w-full items-center justify-between rounded-[14px] px-4 py-3 text-left text-sm font-black transition hover:bg-[#fff3e8]"
+                                    :class="selected === option.value ? 'bg-[#ff6b57] text-white' : 'text-[#4b3a3d]'"
+                                >
+                                    <span x-text="option.label"></span>
+                                    <span x-show="selected === option.value">✓</span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
 
 
                     <button
@@ -656,6 +850,14 @@
                                                             class="mt-2 inline-flex w-fit rounded-full bg-[#fff3da] px-3 py-1 text-[11px] font-black text-[#806226]"
                                                         >
                                                             Destacada
+                                                        </span>
+                                                    @endif
+
+                                                    @if($store->isVerified())
+                                                        <span
+                                                            class="mt-2 inline-flex w-fit rounded-full bg-[#e7f5ef] px-3 py-1 text-[11px] font-black text-[#427764]"
+                                                        >
+                                                            Verificada
                                                         </span>
                                                     @endif
 
@@ -1075,6 +1277,14 @@
                                             >
                                                 {{ $store->unlimited_products ? 'Ilimitado' : 'Gratis' }}
                                             </span>
+
+                                            @if($store->isVerified())
+                                                <span
+                                                    class="rounded-full bg-[#e7f5ef] px-3 py-1 text-xs font-black text-[#427764]"
+                                                >
+                                                    Verificada
+                                                </span>
+                                            @endif
 
                                             @if($store->active)
 

@@ -39,10 +39,21 @@ class StoreController extends Controller
             ],
             'city' => ['bail', 'required', 'string', 'max:100'],
             'delivery_available' => ['nullable', 'boolean'],
+            'location_url' => ['nullable', 'url', 'max:500'],
+            'opening_hours' => ['nullable', 'string', 'max:255'],
+            'facebook_url' => ['nullable', 'url', 'max:500'],
+            'instagram_url' => ['nullable', 'url', 'max:500'],
+            'tiktok_url' => ['nullable', 'url', 'max:500'],
+            'website_url' => ['nullable', 'url', 'max:500'],
             'logo' => [
                 'nullable',
                 File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048),
                 Rule::dimensions()->maxWidth(3000)->maxHeight(3000),
+            ],
+            'gallery_images' => ['nullable', 'array', 'max:6'],
+            'gallery_images.*' => [
+                File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(4096),
+                Rule::dimensions()->maxWidth(4000)->maxHeight(4000),
             ],
         ], [
             'address.required' => 'Agrega una dirección o referencia si tu tienda no ofrece delivery.',
@@ -57,17 +68,26 @@ class StoreController extends Controller
                 ->store('stores/logos', 'public');
         }
 
+        $galleryImages = $this->storeUploadedGalleryImages($request, 'gallery_images', 'stores/gallery');
+
         $baseSlug = Str::slug($validated['name']) ?: 'tienda';
 
         Auth::user()->stores()->create([
             'name' => $validated['name'],
             'slug' => $baseSlug . '-' . Str::random(5),
             'logo' => $logoPath,
+            'gallery_images' => $galleryImages,
             'description' => $validated['description'] ?? null,
             'whatsapp' => $validated['whatsapp'],
             'address' => $validated['address'] ?? null,
+            'location_url' => $validated['location_url'] ?? null,
             'city' => $validated['city'],
             'delivery_available' => $request->boolean('delivery_available'),
+            'opening_hours' => $validated['opening_hours'] ?? null,
+            'facebook_url' => $validated['facebook_url'] ?? null,
+            'instagram_url' => $validated['instagram_url'] ?? null,
+            'tiktok_url' => $validated['tiktok_url'] ?? null,
+            'website_url' => $validated['website_url'] ?? null,
         ]);
 
 
@@ -120,11 +140,24 @@ class StoreController extends Controller
             ],
             'city' => ['bail', 'required', 'string', 'max:100'],
             'delivery_available' => ['nullable', 'boolean'],
+            'location_url' => ['nullable', 'url', 'max:500'],
+            'opening_hours' => ['nullable', 'string', 'max:255'],
+            'facebook_url' => ['nullable', 'url', 'max:500'],
+            'instagram_url' => ['nullable', 'url', 'max:500'],
+            'tiktok_url' => ['nullable', 'url', 'max:500'],
+            'website_url' => ['nullable', 'url', 'max:500'],
             'logo' => [
                 'nullable',
                 File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048),
                 Rule::dimensions()->maxWidth(3000)->maxHeight(3000),
             ],
+            'gallery_images' => ['nullable', 'array', 'max:6'],
+            'gallery_images.*' => [
+                File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(4096),
+                Rule::dimensions()->maxWidth(4000)->maxHeight(4000),
+            ],
+            'remove_gallery_images' => ['nullable', 'array'],
+            'remove_gallery_images.*' => ['string', 'max:255'],
         ], [
             'address.required' => 'Agrega una dirección o referencia si tu tienda no ofrece delivery.',
         ]);
@@ -142,14 +175,28 @@ class StoreController extends Controller
                 ->store('stores/logos', 'public');
         }
 
+        $galleryImages = $this->syncGalleryImages(
+            $store->gallery_images ?? [],
+            $request->input('remove_gallery_images', []),
+            $this->storeUploadedGalleryImages($request, 'gallery_images', 'stores/gallery'),
+            'stores/gallery/',
+            6
+        );
 
         $store->update([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'whatsapp' => $validated['whatsapp'],
             'address' => $validated['address'] ?? null,
+            'location_url' => $validated['location_url'] ?? null,
             'city' => $validated['city'],
             'delivery_available' => $request->boolean('delivery_available'),
+            'opening_hours' => $validated['opening_hours'] ?? null,
+            'facebook_url' => $validated['facebook_url'] ?? null,
+            'instagram_url' => $validated['instagram_url'] ?? null,
+            'tiktok_url' => $validated['tiktok_url'] ?? null,
+            'website_url' => $validated['website_url'] ?? null,
+            'gallery_images' => $galleryImages,
             'logo' => $logoPath,
         ]);
 
@@ -230,5 +277,39 @@ class StoreController extends Controller
         }
 
         return $digits;
+    }
+
+    private function storeUploadedGalleryImages(Request $request, string $field, string $directory): array
+    {
+        $paths = [];
+
+        foreach ($request->file($field, []) as $file) {
+            $paths[] = $file->store($directory, 'public');
+        }
+
+        return $paths;
+    }
+
+    private function syncGalleryImages(
+        array $currentImages,
+        array $imagesToRemove,
+        array $newImages,
+        string $allowedPrefix,
+        int $limit
+    ): array {
+        $imagesToRemove = array_values(array_intersect($imagesToRemove, $currentImages));
+
+        foreach ($imagesToRemove as $image) {
+            $this->deletePublicUpload($image, $allowedPrefix);
+        }
+
+        $keptImages = array_values(array_diff($currentImages, $imagesToRemove));
+        $limitedImages = array_slice(array_merge($keptImages, $newImages), 0, $limit);
+
+        foreach (array_diff($newImages, $limitedImages) as $unusedImage) {
+            $this->deletePublicUpload($unusedImage, $allowedPrefix);
+        }
+
+        return $limitedImages;
     }
 }

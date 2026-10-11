@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Store;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Throwable;
 
 class SitemapController extends Controller
@@ -20,6 +22,45 @@ class SitemapController extends Controller
         ]);
 
         try {
+            Category::query()
+                ->withCount([
+                    'products' => function ($query) {
+                        $query
+                            ->where('active', true)
+                            ->whereHas('store', function ($storeQuery) {
+                                $storeQuery->where('active', true);
+                            });
+                    },
+                ])
+                ->having('products_count', '>', 0)
+                ->latest('updated_at')
+                ->get(['id', 'slug', 'updated_at'])
+                ->each(function (Category $category) use ($urls): void {
+                    $urls->push([
+                        'loc' => route('categories.show', ['category' => $category->slug]),
+                        'lastmod' => $category->updated_at,
+                        'changefreq' => 'weekly',
+                        'priority' => '0.7',
+                    ]);
+                });
+
+            Store::query()
+                ->where('active', true)
+                ->whereNotNull('city')
+                ->where('city', '!=', '')
+                ->select('city')
+                ->distinct()
+                ->orderBy('city')
+                ->pluck('city')
+                ->each(function (string $city) use ($urls): void {
+                    $urls->push([
+                        'loc' => route('cities.show', ['citySlug' => Str::slug($city)]),
+                        'lastmod' => now(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.7',
+                    ]);
+                });
+
             Store::query()
                 ->where('active', true)
                 ->latest('updated_at')

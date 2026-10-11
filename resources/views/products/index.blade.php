@@ -181,6 +181,12 @@
                             <p class="mt-1 text-sm leading-6 text-[#806d70]">
                                 Te quedan {{ $remainingProductSlots }} publicaciones gratis. Luego puedes activar productos ilimitados por S/ {{ $planPrice }}.
                             </p>
+
+                            @if($remainingProductSlots <= 2)
+                                <div class="mt-3 rounded-[18px] bg-[#fff3da] px-4 py-3 text-sm font-black text-[#806226]">
+                                    Te quedan solo {{ $remainingProductSlots }} productos gratis. Puedes desbloquear ilimitado antes de llegar al límite.
+                                </div>
+                            @endif
                         @endif
                     </div>
 
@@ -195,7 +201,7 @@
 
                         @unless($store->unlimited_products)
                             <a
-                                href="#plan-ilimitado"
+                                href="{{ route('seller.plan.index') }}"
                                 class="inline-flex items-center justify-center rounded-full bg-[#442d35] px-4 py-2 text-xs font-black text-white transition hover:bg-[#ff6b57]"
                             >
                                 Activar productos ilimitados

@@ -111,6 +111,11 @@ class ProductController extends Controller
                 File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(4096),
                 Rule::dimensions()->maxWidth(4000)->maxHeight(4000),
             ],
+            'gallery_images' => ['nullable', 'array', 'max:6'],
+            'gallery_images.*' => [
+                File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(4096),
+                Rule::dimensions()->maxWidth(4000)->maxHeight(4000),
+            ],
         ]);
 
         $imagePath = null;
@@ -119,6 +124,8 @@ class ProductController extends Controller
             $imagePath = $request->file('image')
                 ->store('products', 'public');
         }
+
+        $galleryImages = $this->storeUploadedGalleryImages($request, 'gallery_images', 'products/gallery');
 
         $baseSlug = Str::slug($validated['name']) ?: 'producto';
 
@@ -144,6 +151,7 @@ class ProductController extends Controller
             'price' => $validated['price'],
             'stock' => $validated['stock'],
             'image' => $imagePath,
+            'gallery_images' => $galleryImages,
         ]);
 
         return redirect()
@@ -189,6 +197,13 @@ class ProductController extends Controller
                 File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(4096),
                 Rule::dimensions()->maxWidth(4000)->maxHeight(4000),
             ],
+            'gallery_images' => ['nullable', 'array', 'max:6'],
+            'gallery_images.*' => [
+                File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(4096),
+                Rule::dimensions()->maxWidth(4000)->maxHeight(4000),
+            ],
+            'remove_gallery_images' => ['nullable', 'array'],
+            'remove_gallery_images.*' => ['string', 'max:255'],
             'active' => ['nullable', 'boolean'],
         ]);
 
@@ -201,6 +216,14 @@ class ProductController extends Controller
             $imagePath = $request->file('image')
                 ->store('products', 'public');
         }
+
+        $galleryImages = $this->syncGalleryImages(
+            $product->gallery_images ?? [],
+            $request->input('remove_gallery_images', []),
+            $this->storeUploadedGalleryImages($request, 'gallery_images', 'products/gallery'),
+            'products/gallery/',
+            6
+        );
 
         $baseSlug = Str::slug($validated['name']) ?: 'producto';
 
@@ -227,6 +250,7 @@ class ProductController extends Controller
             'price' => $validated['price'],
             'stock' => $validated['stock'],
             'image' => $imagePath,
+            'gallery_images' => $galleryImages,
         ])->forceFill([
             'active' => $request->boolean('active'),
         ])->save();
@@ -269,6 +293,10 @@ class ProductController extends Controller
 
         $this->deletePublicUpload($product->image, 'products/');
 
+        foreach ($product->gallery_images ?? [] as $galleryImage) {
+            $this->deletePublicUpload($galleryImage, 'products/gallery/');
+        }
+
         $product->delete();
 
         return redirect()
@@ -284,5 +312,39 @@ class ProductController extends Controller
 
         return 'https://wa.me/' . config('vendefacil.payment_whatsapp')
             . '?text=' . rawurlencode($message);
+    }
+
+    private function storeUploadedGalleryImages(Request $request, string $field, string $directory): array
+    {
+        $paths = [];
+
+        foreach ($request->file($field, []) as $file) {
+            $paths[] = $file->store($directory, 'public');
+        }
+
+        return $paths;
+    }
+
+    private function syncGalleryImages(
+        array $currentImages,
+        array $imagesToRemove,
+        array $newImages,
+        string $allowedPrefix,
+        int $limit
+    ): array {
+        $imagesToRemove = array_values(array_intersect($imagesToRemove, $currentImages));
+
+        foreach ($imagesToRemove as $image) {
+            $this->deletePublicUpload($image, $allowedPrefix);
+        }
+
+        $keptImages = array_values(array_diff($currentImages, $imagesToRemove));
+        $limitedImages = array_slice(array_merge($keptImages, $newImages), 0, $limit);
+
+        foreach (array_diff($newImages, $limitedImages) as $unusedImage) {
+            $this->deletePublicUpload($unusedImage, $allowedPrefix);
+        }
+
+        return $limitedImages;
     }
 }

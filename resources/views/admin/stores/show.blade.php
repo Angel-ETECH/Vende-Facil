@@ -106,6 +106,14 @@
                                     </span>
                                 @endif
 
+                                @if($store->isVerified())
+                                    <span
+                                        class="rounded-full bg-[#e7f5ef] px-3 py-1.5 text-xs font-black text-[#427764]"
+                                    >
+                                        Verificada
+                                    </span>
+                                @endif
+
                             </div>
 
 
@@ -249,12 +257,35 @@
                                 <dt class="text-xs font-black uppercase tracking-[.08em] text-[#a08a89]">Ubicación</dt>
                                 <dd class="mt-1 text-sm font-bold text-[#514043]">{{ $store->city ? $store->city . ', Perú' : 'Perú' }}</dd>
                                 <dd class="mt-1 text-xs text-[#927e80]">{{ $store->address ?: 'Sin dirección registrada' }}</dd>
+                                @if($store->mapUrl())
+                                    <dd class="mt-2">
+                                        <a
+                                            href="{{ $store->mapUrl() }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-xs font-black text-[#496d9d]"
+                                        >
+                                            Abrir mapa
+                                        </a>
+                                    </dd>
+                                @endif
                             </div>
 
 
                             <div>
                                 <dt class="text-xs font-black uppercase tracking-[.08em] text-[#a08a89]">WhatsApp</dt>
                                 <dd class="mt-1 text-sm font-bold text-[#514043]">+{{ $store->whatsapp }}</dd>
+                            </div>
+
+
+                            <div>
+                                <dt class="text-xs font-black uppercase tracking-[.08em] text-[#a08a89]">Confianza</dt>
+                                <dd class="mt-1 text-sm font-bold text-[#514043]">
+                                    {{ $store->isVerified() ? 'Tienda verificada' : 'Sin verificación' }}
+                                </dd>
+                                <dd class="mt-1 text-xs text-[#927e80]">
+                                    {{ $store->opening_hours ?: 'Sin horario público' }}
+                                </dd>
                             </div>
 
 
@@ -361,6 +392,22 @@
                                 >
                                     {{ $store->isFeatured() ? 'Quitar destacada' : 'Destacar ' . config('vendefacil.featured_days') . ' días' }}
                                     <span aria-hidden="true">{{ $store->isFeatured() ? '-' : '*' }}</span>
+                                </button>
+                            </form>
+
+                            <form
+                                action="{{ route('admin.stores.verified', $store) }}"
+                                method="POST"
+                            >
+                                @csrf
+                                @method('PATCH')
+
+                                <button
+                                    type="submit"
+                                    class="flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-sm font-black transition {{ $store->isVerified() ? 'bg-[#eef0f4] text-[#5f6978] hover:bg-[#e3e7ee]' : 'bg-[#e7f5ef] text-[#427764] hover:bg-[#d8eee6]' }}"
+                                >
+                                    {{ $store->isVerified() ? 'Quitar verificación' : 'Marcar como verificada' }}
+                                    <span aria-hidden="true">{{ $store->isVerified() ? '-' : '✓' }}</span>
                                 </button>
                             </form>
 

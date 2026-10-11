@@ -96,17 +96,17 @@
 
 
                         <a
-                            href="{{ route('seller.payments.index') }}"
+                            href="{{ route('seller.plan.index') }}"
                             class="
                                 rounded-full px-4 py-2 text-sm font-black transition
 
-                                {{ request()->routeIs('seller.payments.*')
+                                {{ request()->routeIs('seller.plan.*') || request()->routeIs('seller.payments.*')
                                     ? 'bg-[#442d35] text-white'
                                     : 'text-[#6f5b5e] hover:bg-[#f3e9e2]'
                                 }}
                             "
                         >
-                            Plan y pagos
+                            Mi plan
                         </a>
 
 
@@ -122,6 +122,20 @@
                     @endif
 
                     @if(auth()->user()->is_admin)
+
+                        <a
+                            href="{{ route('admin.dashboard') }}"
+                            class="
+                                rounded-full px-4 py-2 text-sm font-black transition
+
+                                {{ request()->routeIs('admin.dashboard') || request()->routeIs('admin.earnings')
+                                    ? 'bg-[#ff6b57] text-white'
+                                    : 'text-[#6f5b5e] hover:bg-[#f3e9e2]'
+                                }}
+                            "
+                        >
+                            Ganancias
+                        </a>
 
                         <a
                             href="{{ route('admin.stores.index') }}"
@@ -416,15 +430,22 @@
                     </a>
 
                     <a
-                        href="{{ route('seller.payments.index') }}"
+                        href="{{ route('seller.plan.index') }}"
                         class="block rounded-[12px] px-4 py-3 font-black text-[#5f4c50] hover:bg-[#f5ece5]"
                     >
-                        Plan y pagos
+                        Mi plan
                     </a>
 
                 @endif
 
                 @if(auth()->user()->is_admin)
+
+                    <a
+                        href="{{ route('admin.dashboard') }}"
+                        class="block rounded-[12px] px-4 py-3 font-black text-[#5f4c50] hover:bg-[#f5ece5]"
+                    >
+                        Ganancias
+                    </a>
 
                     <a
                         href="{{ route('admin.stores.index') }}"

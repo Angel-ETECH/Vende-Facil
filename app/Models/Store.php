@@ -13,24 +13,36 @@ class Store extends Model
         'name',
         'slug',
         'logo',
+        'gallery_images',
         'description',
         'whatsapp',
         'address',
+        'location_url',
         'city',
         'delivery_available',
+        'opening_hours',
+        'facebook_url',
+        'instagram_url',
+        'tiktok_url',
+        'website_url',
         'featured',
         'featured_until',
+        'verified',
+        'verified_at',
     ];
 
     protected function casts(): array
     {
         return [
             'active' => 'boolean',
+            'gallery_images' => 'array',
             'delivery_available' => 'boolean',
             'unlimited_products' => 'boolean',
             'unlimited_products_activated_at' => 'datetime',
             'featured' => 'boolean',
             'featured_until' => 'datetime',
+            'verified' => 'boolean',
+            'verified_at' => 'datetime',
         ];
     }
 
@@ -75,6 +87,10 @@ class Store extends Model
 
     public function mapUrl(): ?string
     {
+        if ($this->location_url) {
+            return $this->location_url;
+        }
+
         if (! $this->address && ! $this->city) {
             return null;
         }
@@ -95,6 +111,21 @@ class Store extends Model
     {
         return $this->featured
             && (! $this->featured_until || $this->featured_until->isFuture());
+    }
+
+    public function isVerified(): bool
+    {
+        return (bool) $this->verified;
+    }
+
+    public function socialLinks(): array
+    {
+        return array_filter([
+            'Facebook' => $this->facebook_url,
+            'Instagram' => $this->instagram_url,
+            'TikTok' => $this->tiktok_url,
+            'Web' => $this->website_url,
+        ]);
     }
 
     public function user()

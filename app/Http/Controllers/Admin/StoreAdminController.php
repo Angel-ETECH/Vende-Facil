@@ -82,7 +82,17 @@ class StoreAdminController extends Controller
 
         $unlimitedStores = Store::where('unlimited_products', true)->count();
 
-        $featuredStores = Store::where('featured', true)->count();
+        $featuredStores = Store::query()
+            ->where('active', true)
+            ->where('featured', true)
+            ->where(function ($query) {
+                $query
+                    ->whereNull('featured_until')
+                    ->orWhere('featured_until', '>', now());
+            })
+            ->count();
+
+        $verifiedStores = Store::where('verified', true)->count();
 
         $pendingPaymentProofs = PaymentProof::where('status', PaymentProof::STATUS_PENDING)->count();
 
@@ -106,6 +116,7 @@ class StoreAdminController extends Controller
             'totalProducts',
             'unlimitedStores',
             'featuredStores',
+            'verifiedStores',
             'pendingPaymentProofs'
         ));
     }
@@ -166,6 +177,25 @@ class StoreAdminController extends Controller
             );
     }
 
+    public function toggleVerified(Store $store)
+    {
+        $willVerify = ! $store->verified;
+
+        $store->forceFill([
+            'verified' => $willVerify,
+            'verified_at' => $willVerify ? now() : null,
+        ])->save();
+
+        return redirect()
+            ->back()
+            ->with(
+                'success',
+                $willVerify
+                    ? 'La tienda "' . $store->name . '" ahora aparece como verificada.'
+                    : 'La tienda "' . $store->name . '" dejó de aparecer como verificada.'
+            );
+    }
+
     public function show(Store $store)
     {
         $store->load([
@@ -218,6 +248,10 @@ class StoreAdminController extends Controller
 
             $this->deletePublicUpload($product->image, 'products/');
 
+            foreach ($product->gallery_images ?? [] as $galleryImage) {
+                $this->deletePublicUpload($galleryImage, 'products/gallery/');
+            }
+
         }
 
 
@@ -241,6 +275,10 @@ class StoreAdminController extends Controller
         */
 
         $this->deletePublicUpload($store->logo, 'stores/logos/');
+
+        foreach ($store->gallery_images ?? [] as $galleryImage) {
+            $this->deletePublicUpload($galleryImage, 'stores/gallery/');
+        }
 
 
         /*
