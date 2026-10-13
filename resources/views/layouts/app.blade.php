@@ -22,8 +22,8 @@
         <meta name="robots" content="noindex, nofollow">
 
         <title>{{ $pageTitle }}</title>
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/png" href="{{ asset('favicon-vf.png') }}">
+        <link rel="shortcut icon" type="image/png" href="{{ asset('favicon-vf.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -41,6 +41,7 @@
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
+            <x-community-links />
 
             <!-- Page Heading -->
             @isset($header)

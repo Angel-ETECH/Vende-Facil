@@ -42,6 +42,18 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_correct_credentials_allow_access_without_email_verification(): void
+    {
+        $user = User::factory()->unverified()->create();
+        $this->post('/login', ['email' => $user->email, 'password' => 'password'])
+            ->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticatedAs($user);
+        $this->get('/dashboard')->assertOk();
+        $this->get('/verify-email')->assertRedirect(route('dashboard'));
+        $this->post('/email/verification-notification')->assertRedirect(route('dashboard'));
+        $this->assertNull($user->fresh()->email_verified_at);
+    }
+
     public function test_users_can_logout(): void
     {
         $user = User::factory()->create();

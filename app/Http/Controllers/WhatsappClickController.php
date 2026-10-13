@@ -68,13 +68,14 @@ class WhatsappClickController extends Controller
         string $message,
         Request $request
     ): void {
+        if ($request->user()?->id === $store->user_id) { return; }
         WhatsappClick::create([
             'store_id' => $store->id,
             'product_id' => $product?->id,
             'type' => $type,
             'message' => $message,
             'ip_address' => $request->ip(),
-            'user_agent' => (string) $request->userAgent(),
+            'user_agent' => \Illuminate\Support\Str::substr((string) $request->userAgent(), 0, 1000),
         ]);
     }
 

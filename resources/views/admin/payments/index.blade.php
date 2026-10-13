@@ -203,7 +203,7 @@
                                 <div class="rounded-[24px] border border-[#eaded5] bg-[#fffdf9] p-4">
                                     <div class="flex flex-wrap gap-2">
                                         <a
-                                            href="{{ asset('storage/' . $paymentProof->proof_path) }}"
+                                            href="{{ route('payment-proofs.show', $paymentProof) }}"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             class="inline-flex flex-1 items-center justify-center rounded-[16px] bg-[#442d35] px-4 py-3 text-sm font-black text-white transition hover:bg-[#ff6b57]"
@@ -240,7 +240,9 @@
                                                 <textarea
                                                     name="admin_notes"
                                                     rows="2"
-                                                    placeholder="Motivo opcional del rechazo"
+                                                    placeholder="Motivo del rechazo"
+                                                    required
+                                                    maxlength="1000"
                                                     class="w-full rounded-[16px] border-[#eaded5] bg-white text-sm font-bold text-[#514043] placeholder:text-[#b9a6a3] focus:border-[#ff8b78] focus:ring-[#ff8b78]/25"
                                                 >{{ old('admin_notes') }}</textarea>
 

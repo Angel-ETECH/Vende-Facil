@@ -26,7 +26,7 @@
                 '@id' => url('/').'#organization',
                 'name' => config('seo.site_name'),
                 'url' => url('/'),
-                'logo' => asset('favicon.svg'),
+                'logo' => asset('images/brand/vendefacil-logo.png'),
                 'sameAs' => [
                     'https://github.com/Angel-ETECH/Vende-Facil',
                 ],
@@ -73,8 +73,8 @@
     </title>
 
     <link rel="canonical" href="{{ $seoCanonical }}">
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
-    <link rel="shortcut icon" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon-vf.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('favicon-vf.png') }}">
 
     <meta property="og:site_name" content="{{ config('seo.site_name') }}">
     <meta property="og:locale" content="{{ config('seo.locale') }}">
@@ -315,42 +315,7 @@
                     href="{{ route('home') }}"
                     class="flex items-center gap-3"
                 >
-
-                    <div
-                        class="flex h-11 w-11 rotate-[-4deg] items-center justify-center rounded-[16px] bg-[#ff6b57] shadow-lg shadow-orange-200"
-                    >
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            class="h-6 w-6 text-white"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 10h16M5 10l1-5h12l1 5M6 10v9h12v-9M9 19v-5h6v5"
-                            />
-                        </svg>
-
-                    </div>
-
-
-                    <div>
-
-                        <div class="text-[21px] font-black tracking-[-.04em]">
-                            Vende<span class="text-[#ff6b57]">Fácil</span>
-                        </div>
-
-                        <div
-                            class="-mt-1 text-[10px] font-bold uppercase tracking-[.18em] text-[#9c8680]"
-                        >
-                            negocios con onda
-                        </div>
-
-                    </div>
+                    <x-brand-logo />
 
                 </a>
 
@@ -534,6 +499,8 @@
 
 
     <main>
+        <x-community-links />
+        @if(session('success'))<div role="status" class="vf-container py-4 font-bold text-[#427764]">{{ session('success') }}</div>@endif
         @yield('content')
     </main>
 

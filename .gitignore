@@ -3,6 +3,9 @@
 .env
 .env.backup
 .env.production
+.env.*.backup
+/storage/app/private/*
+!/storage/app/private/.gitignore
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -22,6 +25,7 @@
 !/storage/app/public/.gitignore
 /storage/*.key
 /storage/pail
+/storage/framework/hot.launch-backup-*
 /vendor
 Homestead.json
 Homestead.yaml

@@ -49,11 +49,16 @@ class HomeController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $search = trim($request->get('buscar', ''));
-
-        $categorySlug = trim($request->get('categoria', ''));
-
-        $city = trim($request->get('ciudad', ''));
+        $filters = $request->validate([
+            'buscar' => ['nullable', 'string', 'max:150'],
+            'categoria' => ['nullable', 'string', 'max:100'],
+            'ciudad' => ['nullable', 'string', 'max:100'],
+            'delivery' => ['nullable', 'boolean'],
+            'productos' => ['nullable', 'integer', 'min:1'],
+        ]);
+        $search = trim($filters['buscar'] ?? '');
+        $categorySlug = trim($filters['categoria'] ?? '');
+        $city = trim($filters['ciudad'] ?? '');
 
         $delivery = $request->boolean('delivery');
 

@@ -7,8 +7,8 @@
         <meta name="robots" content="noindex, nofollow">
 
         <title>{{ config('app.name', 'VendeFácil') }}</title>
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/png" href="{{ asset('favicon-vf.png') }}">
+        <link rel="shortcut icon" type="image/png" href="{{ asset('favicon-vf.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

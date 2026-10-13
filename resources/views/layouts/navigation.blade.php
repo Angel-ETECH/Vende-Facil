@@ -15,48 +15,13 @@
                     href="{{ route('dashboard') }}"
                     class="flex items-center gap-3"
                 >
-
-                    <div
-                        class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#ff6b57] text-white shadow-sm"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.8"
-                            stroke="currentColor"
-                            class="h-6 w-6"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M3.75 9.75 12 4.5l8.25 5.25M5.25 8.8V19.5h13.5V8.8M9 19.5v-5.25h6v5.25"
-                            />
-                        </svg>
-                    </div>
-
-
-                    <div class="hidden sm:block">
-
-                        <div
-                            class="text-[20px] font-black tracking-[-.04em] text-[#35272a]"
-                        >
-                            Vende<span class="text-[#ff604c]">Fácil</span>
-                        </div>
-
-                        <div
-                            class="-mt-1 text-[10px] font-semibold tracking-[.08em] text-[#9b8583]"
-                        >
-                            panel del vendedor
-                        </div>
-
-                    </div>
+                    <x-brand-logo size="panel" />
 
                 </a>
 
 
                 {{-- NAVEGACIÓN DESKTOP --}}
-                <div class="hidden items-center gap-2 md:flex">
+                <div class="hidden items-center gap-2 xl:flex">
 
                     <a
                         href="{{ route('dashboard') }}"
@@ -352,7 +317,10 @@
             <button
                 type="button"
                 @click="open = !open"
-                class="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5ece5] text-[#442d35] sm:hidden"
+                :aria-expanded="open.toString()"
+                :aria-label="open ? 'Cerrar menú' : 'Abrir menú'"
+                aria-controls="seller-navigation"
+                class="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5ece5] text-[#442d35] xl:hidden"
             >
 
                 <svg
@@ -396,10 +364,11 @@
 
         {{-- MOBILE --}}
         <div
+            id="seller-navigation"
             x-show="open"
             x-transition
             x-cloak
-            class="border-t border-[#eaded5] pb-5 pt-3 sm:hidden"
+            class="border-t border-[#eaded5] pb-5 pt-3 xl:hidden"
         >
 
             <div class="space-y-1">

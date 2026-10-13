@@ -6,19 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\PaymentProof;
 use App\Models\Product;
 use App\Models\Store;
-use App\Support\SafePublicStorage;
+use App\Services\StoreUploadCleanup;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class StoreAdminController extends Controller
 {
-    use SafePublicStorage;
-
     public function index(Request $request)
     {
-        $search = trim($request->get('buscar', ''));
-        $city = trim($request->get('ciudad', ''));
-        $status = $request->get('estado', 'todos');
-        $delivery = $request->get('delivery', 'todos');
+        $filters = $request->validate([
+            'buscar' => ['nullable', 'string', 'max:150'],
+            'ciudad' => ['nullable', 'string', 'max:100'],
+            'estado' => ['nullable', Rule::in(['todos', 'activa', 'inactiva'])],
+            'delivery' => ['nullable', Rule::in(['todos', 'si', 'no'])],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+        $search = trim($filters['buscar'] ?? '');
+        $city = trim($filters['ciudad'] ?? '');
+        $status = $filters['estado'] ?? 'todos';
+        $delivery = $filters['delivery'] ?? 'todos';
 
         if (! in_array($status, ['todos', 'activa', 'inactiva'], true)) {
             $status = 'todos';
@@ -41,7 +47,7 @@ class StoreAdminController extends Controller
                     $query->whereDate('created_at', today());
                 },
             ])
-            ->when($search, function ($query) use ($search) {
+            ->when($search !== '', function ($query) use ($search) {
 
                 $query->where(function ($q) use ($search) {
 
@@ -60,7 +66,7 @@ class StoreAdminController extends Controller
                 });
 
             })
-            ->when($city, function ($query) use ($city) {
+            ->when($city !== '', function ($query) use ($city) {
                 $query->where('city', $city);
             })
             ->when($status !== 'todos', function ($query) use ($status) {
@@ -236,78 +242,15 @@ class StoreAdminController extends Controller
     }
 
 
-    public function destroy(Store $store)
+    public function destroy(Store $store, StoreUploadCleanup $uploads)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | ELIMINAR IMÁGENES DE LOS PRODUCTOS
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($store->products as $product) {
-
-            $this->deletePublicUpload($product->image, 'products/');
-
-            foreach ($product->gallery_images ?? [] as $galleryImage) {
-                $this->deletePublicUpload($galleryImage, 'products/gallery/');
-            }
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ELIMINAR COMPROBANTES DE PAGO
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($store->paymentProofs as $paymentProof) {
-
-            $this->deletePublicUpload($paymentProof->proof_path, 'payment-proofs/');
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ELIMINAR LOGO DE LA TIENDA
-        |--------------------------------------------------------------------------
-        */
-
-        $this->deletePublicUpload($store->logo, 'stores/logos/');
-
-        foreach ($store->gallery_images ?? [] as $galleryImage) {
-            $this->deletePublicUpload($galleryImage, 'stores/gallery/');
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | GUARDAR NOMBRE ANTES DE ELIMINAR
-        |--------------------------------------------------------------------------
-        */
-
+        $manifest = $uploads->collect($store);
         $storeName = $store->name;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ELIMINAR TIENDA
-        |--------------------------------------------------------------------------
-        |
-        | Al tener cascadeOnDelete() en products.store_id,
-        | los productos asociados también serán eliminados.
-        |
-        */
-
         $store->delete();
-
+        $uploads->remove($manifest);
 
         return redirect()
             ->route('admin.stores.index')
-            ->with(
-                'success',
-                'La tienda "' . $storeName . '" fue eliminada correctamente.'
-            );
+            ->with('success', 'La tienda "' . $storeName . '" fue eliminada correctamente.');
     }
 }

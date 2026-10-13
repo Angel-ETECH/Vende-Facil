@@ -50,8 +50,8 @@
                 </div>
             @endif
 
-            <div class="mt-8 grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
-                <div class="overflow-hidden rounded-[30px] border border-[#eaded5] bg-white shadow-[0_18px_45px_rgba(91,53,43,.08)]">
+            <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1.05fr_.95fr]">
+                <div class="min-w-0 overflow-hidden rounded-[30px] border border-[#eaded5] bg-white shadow-[0_18px_45px_rgba(91,53,43,.08)]">
                     <div class="h-[6px] bg-gradient-to-r from-[#6a55ff] via-[#9c4dcc] to-[#ff6b57]"></div>
 
                     <div class="p-6 sm:p-8">
@@ -149,7 +149,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-[30px] border border-[#eaded5] bg-white p-6 shadow-[0_18px_45px_rgba(91,53,43,.08)] sm:p-8">
+                <div class="min-w-0 rounded-[30px] border border-[#eaded5] bg-white p-6 shadow-[0_18px_45px_rgba(91,53,43,.08)] sm:p-8">
                     @if($store->unlimited_products)
                         <div class="rounded-[24px] bg-[#e7f5ef] p-6">
                             <p class="text-xs font-black uppercase tracking-[.12em] text-[#427764]">Activo</p>
@@ -171,7 +171,7 @@
                             </p>
 
                             <a
-                                href="{{ asset('storage/' . $pendingPaymentProof->proof_path) }}"
+                                href="{{ route('payment-proofs.show', $pendingPaymentProof) }}"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 class="mt-5 inline-flex w-full items-center justify-center rounded-[18px] bg-[#442d35] px-5 py-3.5 text-sm font-black text-white transition hover:bg-[#ff6b57]"
@@ -420,7 +420,7 @@
                                 </div>
 
                                 <a
-                                    href="{{ asset('storage/' . $paymentProof->proof_path) }}"
+                                    href="{{ route('payment-proofs.show', $paymentProof) }}"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     class="inline-flex items-center justify-center rounded-full bg-[#442d35] px-4 py-2 text-xs font-black text-white transition hover:bg-[#ff6b57]"

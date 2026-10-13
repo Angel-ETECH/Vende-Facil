@@ -62,7 +62,7 @@ Route::get('/tienda/{store:slug}/producto/{product}/whatsapp', [WhatsappClickCon
 Route::get('/dashboard', function () {
     return view('dashboard');
 })
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->name('dashboard');
 
 
@@ -72,7 +72,7 @@ Route::get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'verified', 'throttle:60,1'])->group(function () {
+Route::middleware(['auth', 'throttle:60,1'])->group(function () {
 
     Route::get(
         '/profile',
@@ -211,3 +211,22 @@ Route::middleware(['auth', 'admin', 'throttle:40,1'])
     });
 
 require __DIR__ . '/auth.php';
+
+Route::middleware(['auth', 'throttle:60,1'])->group(function () {
+    Route::get('/comprobantes/{paymentProof}', [PaymentProofController::class, 'show'])->name('payment-proofs.show');
+    Route::get('/notificaciones', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notificaciones/leer-todas', [\App\Http\Controllers\NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::patch('/notificaciones/{id}', [\App\Http\Controllers\NotificationController::class, 'read'])->name('notifications.read');
+    Route::get('/favoritos', [\App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favoritos/{type}/{id}', [\App\Http\Controllers\FavoriteController::class, 'store'])->whereNumber('id')->name('favorites.store');
+    Route::delete('/favoritos/{type}/{id}', [\App\Http\Controllers\FavoriteController::class, 'destroy'])->whereNumber('id')->name('favorites.destroy');
+});
+Route::middleware(['auth', 'throttle:10,1'])->group(function () {
+    Route::get('/denunciar/{store:slug}', [\App\Http\Controllers\ListingReportController::class, 'create'])->name('reports.create');
+    Route::post('/denunciar/{store:slug}', [\App\Http\Controllers\ListingReportController::class, 'store'])->name('reports.store');
+    Route::get('/estadisticas', [\App\Http\Controllers\SellerAnalyticsController::class, 'index'])->name('seller.analytics');
+});
+Route::middleware(['auth', 'admin', 'throttle:40,1'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/denuncias', [\App\Http\Controllers\ListingReportController::class, 'index'])->name('reports.index');
+    Route::patch('/denuncias/{listingReport}', [\App\Http\Controllers\ListingReportController::class, 'review'])->name('reports.review');
+});

@@ -140,13 +140,7 @@ Verifica tu correo electrónico para activar tu cuenta de VendeFácil.
                         href="{{ route('home') }}"
                         class="mb-6 inline-flex items-center gap-3 rounded-full border border-[#efe2d8] bg-[#fffaf4] px-3 py-2 text-sm font-black text-[#3d3032] transition hover:border-[#ffd2c8] hover:text-[#ff604c]"
                     >
-                        <span
-                            class="flex h-9 w-9 items-center justify-center rounded-full bg-[#ff6b57] text-white shadow-sm"
-                        >
-                            VF
-                        </span>
-
-                        VendeFácil
+                            <x-brand-logo size="panel" />
                     </a>
 
 

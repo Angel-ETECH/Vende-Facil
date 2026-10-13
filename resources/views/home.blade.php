@@ -10,22 +10,18 @@
 
 @section('image', asset('images/seo/vendefacil-home.png'))
 
+@push('head')
+    <link rel="preload" as="image" href="{{ asset('images/hero/mercado-artesanal.png') }}">
+@endpush
+
 
 @section('content')
 
 {{-- ========================================================= --}}
 {{-- HERO --}}
 {{-- ========================================================= --}}
-<section class="relative overflow-hidden bg-[#fff3e5]">
-
-    <div
-        class="absolute -left-24 top-16 h-56 w-56 rounded-full bg-[#ffd66b] opacity-45"
-    ></div>
-
-    <div
-        class="absolute -right-20 top-0 h-72 w-72 rounded-full bg-[#f3c3cf] opacity-75"
-    ></div>
-
+<section class="vf-home-photo relative overflow-hidden bg-[#fff3e5]">
+    <img class="vf-home-photo__image" src="{{ asset('images/hero/mercado-artesanal.png') }}" alt="" aria-hidden="true" fetchpriority="high" width="512" height="308">
 
     <div
         class="vf-container relative grid min-h-[620px] items-center gap-12 py-16 lg:grid-cols-[1.08fr_.92fr] lg:py-20"
@@ -37,39 +33,23 @@
         <div>
 
             <div
-                class="inline-flex items-center gap-2 rounded-full bg-[#f3c95f] px-5 py-3 text-sm font-black text-[#4c382e] shadow-sm"
+                class="vf-hero-eyebrow"
             >
 
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    class="h-4 w-4 text-[#ff7b67]"
-                >
-                    <path
-                        d="M12 2l1.6 4.4L18 8l-4.4 1.6L12 14l-1.6-4.4L6 8l4.4-1.6L12 2Z"
-                    />
-
-                    <path
-                        d="M19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14Z"
-                    />
-                </svg>
-
-                Aquí siempre hay algo nuevo
+                <span class="vf-hero-eyebrow__rule" aria-hidden="true"></span>
+                <span>Aquí siempre hay algo nuevo</span>
 
             </div>
 
 
             <h1
-                class="mt-7 max-w-[700px] text-[47px] font-black leading-[.98] tracking-[-.055em] text-[#35272a] sm:text-[64px] lg:text-[78px]"
+                class="vf-hero-title mt-7 max-w-[700px] text-[47px] font-black leading-[.98] text-[#35272a] sm:text-[64px] lg:text-[78px]"
             >
-                Encuentra cosas
-
-                <span class="relative inline-block text-[#ff604c]">
-                    que te hagan
+                <span class="vf-hero-title__line">Encuentra cosas</span>
+                <span class="vf-hero-title__line text-[#ff604c]">que te hagan</span>
+                <span class="vf-hero-title__line">
+                    <span class="vf-hero-title__smile">sonreír<span class="vf-hero-title__period">.</span></span>
                 </span>
-
-                sonreír.
             </h1>
 
 
@@ -101,7 +81,7 @@
 
 
                 <div
-                    class="vf-search flex flex-col gap-2 rounded-[24px] bg-white p-2 sm:flex-row"
+                    class="vf-search vf-hero-search flex flex-col gap-2 rounded-[24px] bg-white p-2 sm:flex-row"
                 >
 
                     <div class="flex flex-1 items-center">
@@ -148,7 +128,7 @@
 
 
                 <div
-                    class="mt-3 grid gap-3 rounded-[22px] bg-white/70 p-3 backdrop-blur sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
+                    class="vf-hero-filters mt-3 grid gap-3 rounded-[22px] bg-white/70 p-3 backdrop-blur sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
                 >
 
                     <label
@@ -166,7 +146,7 @@
                         @click.outside="open = false"
                     >
                         <span
-                            class="mb-1 block text-xs font-black uppercase tracking-[.12em] text-[#8b7678]"
+                            class="vf-hero-city-label mb-1 block text-xs font-black uppercase tracking-[.12em] text-[#8b7678]"
                         >
                             Ciudad
                         </span>
@@ -180,7 +160,7 @@
                         <button
                             type="button"
                             @click="open = !open"
-                            class="flex h-14 w-full items-center justify-between gap-3 rounded-[16px] border border-[#eaded5] bg-[#fffdf9] px-4 text-left text-sm font-black text-[#4b3a3d] shadow-sm transition hover:border-[#ffd2c8] hover:bg-white focus:border-[#ff8b78] focus:outline-none focus:ring-2 focus:ring-[#ff8b78]/25"
+                            class="vf-hero-filter-control flex h-14 w-full items-center justify-between gap-3 rounded-[16px] border border-[#eaded5] bg-[#fffdf9] px-4 text-left text-sm font-black text-[#4b3a3d] shadow-sm transition hover:border-[#ffd2c8] hover:bg-white focus:border-[#ff8b78] focus:outline-none focus:ring-2 focus:ring-[#ff8b78]/25"
                         >
                             <span x-text="label"></span>
 
@@ -233,7 +213,7 @@
 
 
                     <label
-                        class="flex h-14 cursor-pointer items-center justify-center gap-3 rounded-[16px] border border-[#eaded5] bg-[#fffdf9] px-5 transition hover:bg-[#fff8f0]"
+                        class="vf-hero-filter-control flex h-14 cursor-pointer items-center justify-center gap-3 rounded-[16px] border border-[#eaded5] bg-[#fffdf9] px-5 transition hover:bg-[#fff8f0]"
                     >
                         <input
                             type="checkbox"
@@ -256,7 +236,7 @@
             {{-- ================================================= --}}
             {{-- CATEGORÍAS FUNCIONALES --}}
             {{-- ================================================= --}}
-            <div class="mt-7">
+            <div class="vf-hero-categories mt-7">
 
                 <div class="flex flex-wrap gap-3">
 
@@ -939,6 +919,9 @@
 
                 @foreach($products as $product)
 
+                    <div class="relative min-w-0">
+                    <div class="absolute right-3 top-3 z-10"><x-favorite-button type="product" :id="$product->id" /></div>
+
                     <a
                         href="{{ route('stores.show', $product->store) }}"
                         class="vf-card vf-product-image group overflow-hidden rounded-[28px] border border-[#eaded5] bg-[#fffdf9]"
@@ -953,6 +936,8 @@
 
                                 <img
                                     src="{{ asset('storage/' . $product->image) }}"
+                                    loading="lazy"
+                                    decoding="async"
                                     alt="{{ $product->name }}"
                                     class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
                                 >
@@ -1123,6 +1108,7 @@
                         </div>
 
                     </a>
+                    </div>
 
                 @endforeach
 

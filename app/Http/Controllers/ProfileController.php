@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Services\StoreUploadCleanup;
+use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
@@ -40,17 +42,22 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, StoreUploadCleanup $uploads): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
-
+        $manifests = $user->stores()->get()->map(fn ($store) => $uploads->collect($store));
         Auth::logout();
-
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            $user->notifications()->delete();
+            $user->delete();
+        });
+        foreach ($manifests as $manifest) {
+            $uploads->remove($manifest);
+        }
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

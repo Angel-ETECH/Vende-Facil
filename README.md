@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/vendefacil-home.png" alt="Vista principal de VendeFácil">
+  <img src="docs/images/vendefacil-home.png" alt="Portada actual de VendeFácil con su nuevo logotipo y fondo de mercado artesanal">
 </p>
 
 ## Descripción
@@ -27,7 +27,7 @@ El proyecto incluye una experiencia pública para explorar productos y tiendas, 
 - Filtros por categoría, ciudad y disponibilidad de delivery.
 - Página pública para cada tienda con sus productos activos.
 - Ubicación de tienda con dirección, ciudad y acceso a Google Maps.
-- Registro, login, recuperación de contraseña y verificación de correo.
+- Registro y login directo, sin verificación obligatoria de correo; recuperación de contraseña preparada para SMTP.
 - Panel para vendedores con administración de tienda.
 - CRUD de productos con imagen, precio, stock y categoría.
 - Límite gratuito de productos y plan de productos ilimitados.
@@ -35,6 +35,8 @@ El proyecto incluye una experiencia pública para explorar productos y tiendas, 
 - Contacto directo por WhatsApp para tiendas y productos.
 - Registro de clics a WhatsApp y visitas a tiendas.
 - Panel de administración para revisar pagos, destacar, pausar o eliminar tiendas.
+- Favoritos de productos y tiendas, denuncias y notificaciones dentro de la cuenta.
+- Galerías de imágenes, horarios, redes sociales y enlaces para compartir tiendas.
 - Diseño responsive con Blade, Tailwind CSS y Alpine.js.
 
 ## Seguridad
@@ -45,7 +47,8 @@ El proyecto incluye varias medidas de seguridad aplicadas sobre la base de Larav
 - Hash seguro de contraseñas.
 - Protección CSRF en formularios.
 - Limitación de intentos en login, registro, reset de contraseña, zona privada y admin.
-- Protección de rutas con `auth`, `verified` y middleware `admin`.
+- Protección de rutas con `auth` y middleware `admin`.
+- Comprobantes privados accesibles solo para su propietario o el administrador.
 - Validación de imágenes por tipo, peso y dimensiones.
 - Protección contra asignación masiva de campos sensibles como `is_admin`, `user_id`, `store_id` y `active`.
 - Headers de seguridad: `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `Content-Security-Policy`, COOP y CORP.
@@ -60,7 +63,7 @@ El proyecto queda preparado para indexación y vista social:
 - Open Graph y Twitter Cards para compartir mejor en redes.
 - Datos estructurados JSON-LD para `Organization`, `WebSite`, búsqueda interna y tiendas.
 - `robots.txt` dinámico con rutas privadas bloqueadas.
-- `sitemap.xml` dinámico con portada y tiendas activas.
+- `sitemap.xml` dinámico con portada, tiendas activas, ciudades y categorías con productos disponibles.
 - `noindex` en login, registro, panel privado, perfil y administración.
 - Imagen social en `public/images/seo/vendefacil-home.png`.
 

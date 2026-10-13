@@ -7,6 +7,10 @@ use App\Models\Product;
 use App\Support\SafePublicStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\Store;
+use App\Support\OptimizedImage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
@@ -118,41 +122,54 @@ class ProductController extends Controller
             ],
         ]);
 
-        $imagePath = null;
+        $uploadedPaths = [];
+        try {
+            DB::transaction(function () use ($store, $request, $validated, &$uploadedPaths) {
+                $store = Store::whereKey($store->id)->lockForUpdate()->firstOrFail();
+                if (! $store->canCreateMoreProducts()) {
+                    throw ValidationException::withMessages(['name' => 'Alcanzaste el limite del plan gratuito.']);
+                }
+                $imagePath = null;
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')
-                ->store('products', 'public');
+                if ($request->hasFile('image')) {
+                    $imagePath = OptimizedImage::store($request->file('image'), 'products');
+                    $uploadedPaths[] = $imagePath;
+                }
+
+                $galleryImages = $this->storeUploadedGalleryImages($request, 'gallery_images', 'products/gallery');
+                $uploadedPaths = array_merge($uploadedPaths, $galleryImages);
+
+                $baseSlug = Str::slug($validated['name']) ?: 'producto';
+
+                $slug = $baseSlug;
+
+                $counter = 1;
+
+                while (
+                    Product::where('store_id', $store->id)
+                        ->where('slug', $slug)
+                        ->exists()
+                ) {
+                    $slug = $baseSlug . '-' . $counter;
+
+                    $counter++;
+                }
+
+                $store->products()->create([
+                    'category_id' => $validated['category_id'],
+                    'name' => $validated['name'],
+                    'slug' => $slug,
+                    'description' => $validated['description'] ?? null,
+                    'price' => $validated['price'],
+                    'stock' => $validated['stock'],
+                    'image' => $imagePath,
+                    'gallery_images' => $galleryImages,
+                ]);
+            });
+        } catch (\Throwable $exception) {
+            foreach ($uploadedPaths as $path) { $this->deletePublicUpload($path, 'products/'); }
+            throw $exception;
         }
-
-        $galleryImages = $this->storeUploadedGalleryImages($request, 'gallery_images', 'products/gallery');
-
-        $baseSlug = Str::slug($validated['name']) ?: 'producto';
-
-        $slug = $baseSlug;
-
-        $counter = 1;
-
-        while (
-            Product::where('store_id', $store->id)
-                ->where('slug', $slug)
-                ->exists()
-        ) {
-            $slug = $baseSlug . '-' . $counter;
-
-            $counter++;
-        }
-
-        $store->products()->create([
-            'category_id' => $validated['category_id'],
-            'name' => $validated['name'],
-            'slug' => $slug,
-            'description' => $validated['description'] ?? null,
-            'price' => $validated['price'],
-            'stock' => $validated['stock'],
-            'image' => $imagePath,
-            'gallery_images' => $galleryImages,
-        ]);
 
         return redirect()
             ->route('products.index')
@@ -207,53 +224,67 @@ class ProductController extends Controller
             'active' => ['nullable', 'boolean'],
         ]);
 
-        $imagePath = $product->image;
+        $uploadedPaths = [];
+        try {
+            $imagePath = $product->image;
+            $oldImagePath = $product->image;
+            $oldGalleryImages = $product->gallery_images ?? [];
 
-        if ($request->hasFile('image')) {
+            if ($request->hasFile('image')) {
 
-            $this->deletePublicUpload($product->image, 'products/');
+                $imagePath = OptimizedImage::store($request->file('image'), 'products');
+                $uploadedPaths[] = $imagePath;
+            }
 
-            $imagePath = $request->file('image')
-                ->store('products', 'public');
+            $newGalleryImages = $this->storeUploadedGalleryImages($request, 'gallery_images', 'products/gallery');
+            $uploadedPaths = array_merge($uploadedPaths, $newGalleryImages);
+
+            $galleryImages = $this->syncGalleryImages(
+                $product->gallery_images ?? [],
+                $request->input('remove_gallery_images', []),
+                $newGalleryImages,
+                'products/gallery/',
+                6
+            );
+
+            $baseSlug = Str::slug($validated['name']) ?: 'producto';
+
+            $slug = $baseSlug;
+
+            $counter = 1;
+
+            while (
+                Product::where('store_id', $store->id)
+                    ->where('slug', $slug)
+                    ->where('id', '!=', $product->id)
+                    ->exists()
+            ) {
+                $slug = $baseSlug . '-' . $counter;
+
+                $counter++;
+            }
+
+            $product->fill([
+                'category_id' => $validated['category_id'],
+                'name' => $validated['name'],
+                'slug' => $slug,
+                'description' => $validated['description'] ?? null,
+                'price' => $validated['price'],
+                'stock' => $validated['stock'],
+                'image' => $imagePath,
+                'gallery_images' => $galleryImages,
+            ])->forceFill([
+                'active' => $request->boolean('active'),
+            ])->save();
+        } catch (\Throwable $exception) {
+            foreach ($uploadedPaths as $path) {
+                $this->deletePublicUpload($path, 'products/');
+            }
+            throw $exception;
         }
 
-        $galleryImages = $this->syncGalleryImages(
-            $product->gallery_images ?? [],
-            $request->input('remove_gallery_images', []),
-            $this->storeUploadedGalleryImages($request, 'gallery_images', 'products/gallery'),
-            'products/gallery/',
-            6
-        );
-
-        $baseSlug = Str::slug($validated['name']) ?: 'producto';
-
-        $slug = $baseSlug;
-
-        $counter = 1;
-
-        while (
-            Product::where('store_id', $store->id)
-                ->where('slug', $slug)
-                ->where('id', '!=', $product->id)
-                ->exists()
-        ) {
-            $slug = $baseSlug . '-' . $counter;
-
-            $counter++;
-        }
-
-        $product->fill([
-            'category_id' => $validated['category_id'],
-            'name' => $validated['name'],
-            'slug' => $slug,
-            'description' => $validated['description'] ?? null,
-            'price' => $validated['price'],
-            'stock' => $validated['stock'],
-            'image' => $imagePath,
-            'gallery_images' => $galleryImages,
-        ])->forceFill([
-            'active' => $request->boolean('active'),
-        ])->save();
+        if ($oldImagePath !== $imagePath) { $this->deletePublicUpload($oldImagePath, 'products/'); }
+        foreach (array_diff($oldGalleryImages, $galleryImages) as $image) { $this->deletePublicUpload($image, 'products/gallery/'); }
 
         return redirect()
             ->route('products.index')
@@ -291,13 +322,14 @@ class ProductController extends Controller
             abort(403);
         }
 
-        $this->deletePublicUpload($product->image, 'products/');
+        $imagePath = $product->image;
+        $galleryImages = $product->gallery_images ?? [];
+        $product->delete();
 
-        foreach ($product->gallery_images ?? [] as $galleryImage) {
+        $this->deletePublicUpload($imagePath, 'products/');
+        foreach ($galleryImages as $galleryImage) {
             $this->deletePublicUpload($galleryImage, 'products/gallery/');
         }
-
-        $product->delete();
 
         return redirect()
             ->route('products.index')
@@ -314,37 +346,4 @@ class ProductController extends Controller
             . '?text=' . rawurlencode($message);
     }
 
-    private function storeUploadedGalleryImages(Request $request, string $field, string $directory): array
-    {
-        $paths = [];
-
-        foreach ($request->file($field, []) as $file) {
-            $paths[] = $file->store($directory, 'public');
-        }
-
-        return $paths;
-    }
-
-    private function syncGalleryImages(
-        array $currentImages,
-        array $imagesToRemove,
-        array $newImages,
-        string $allowedPrefix,
-        int $limit
-    ): array {
-        $imagesToRemove = array_values(array_intersect($imagesToRemove, $currentImages));
-
-        foreach ($imagesToRemove as $image) {
-            $this->deletePublicUpload($image, $allowedPrefix);
-        }
-
-        $keptImages = array_values(array_diff($currentImages, $imagesToRemove));
-        $limitedImages = array_slice(array_merge($keptImages, $newImages), 0, $limit);
-
-        foreach (array_diff($newImages, $limitedImages) as $unusedImage) {
-            $this->deletePublicUpload($unusedImage, $allowedPrefix);
-        }
-
-        return $limitedImages;
-    }
 }

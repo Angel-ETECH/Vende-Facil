@@ -379,6 +379,10 @@
                     </div>
 
 
+                    <div class="flex flex-wrap items-center gap-3">
+                        <x-favorite-button type="store" :id="$store->id" />
+                        <a href="{{ route('reports.create', $store) }}" class="inline-flex items-center gap-2 text-sm font-bold text-[#8d787a]"><i data-lucide="flag" class="h-4 w-4"></i>Denunciar tienda</a>
+                    </div>
                     {{-- WHATSAPP --}}
                     <a
                         href="{{ route('stores.whatsapp', $store) }}"
@@ -803,6 +807,7 @@
                 @foreach($products as $product)
 
                     <article
+                        id="product-{{ $product->id }}"
                         class="vf-card vf-product-image overflow-hidden rounded-[24px] border border-[#eaded5] bg-white"
                         x-show="matchesProduct(
                             @js($product->name),
@@ -818,10 +823,17 @@
                             class="relative h-[210px] overflow-hidden bg-[#f6e8de]"
                         >
 
+                            <div class="absolute right-3 top-3 z-10 flex gap-2">
+                                <x-favorite-button type="product" :id="$product->id" />
+                                <a href="{{ route('reports.create', ['store' => $store, 'producto' => $product->id]) }}" title="Denunciar producto" aria-label="Denunciar producto" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#eaded5] bg-white text-[#78676a]"><i data-lucide="flag" class="h-4 w-4"></i></a>
+                            </div>
+
                             @if($product->image)
 
                                 <img
                                     src="{{ asset('storage/' . $product->image) }}"
+                                    loading="lazy"
+                                    decoding="async"
                                     alt="{{ $product->name }}"
                                     class="h-full w-full object-cover"
                                 >

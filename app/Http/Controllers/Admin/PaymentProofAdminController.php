@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\PaymentProof;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\Store;
+use App\Notifications\MarketplaceNotice;
+use Illuminate\Validation\ValidationException;
 
 class PaymentProofAdminController extends Controller
 {
@@ -41,25 +45,25 @@ class PaymentProofAdminController extends Controller
 
     public function approve(PaymentProof $paymentProof)
     {
-        if (! $paymentProof->isPending()) {
-            return redirect()
-                ->back()
-                ->with('error', 'Este comprobante ya fue revisado.');
-        }
+        DB::transaction(function () use ($paymentProof) {
+            $store = Store::whereKey($paymentProof->store_id)->lockForUpdate()->firstOrFail();
+            $paymentProof = PaymentProof::whereKey($paymentProof->id)->lockForUpdate()->firstOrFail();
+            if (! $paymentProof->isPending()) {
+                throw ValidationException::withMessages(['payment' => 'Este comprobante ya fue revisado.']);
+            }
+            $paymentProof->forceFill([
+                'status' => PaymentProof::STATUS_APPROVED,
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+                'admin_notes' => null,
+            ])->save();
 
-        $paymentProof->load('store');
-
-        $paymentProof->forceFill([
-            'status' => PaymentProof::STATUS_APPROVED,
-            'reviewed_by' => Auth::id(),
-            'reviewed_at' => now(),
-            'admin_notes' => null,
-        ])->save();
-
-        $paymentProof->store->forceFill([
-            'unlimited_products' => true,
-            'unlimited_products_activated_at' => now(),
-        ])->save();
+            $store->forceFill([
+                'unlimited_products' => true,
+                'unlimited_products_activated_at' => now(),
+            ])->save();
+            $store->user->notify(new MarketplaceNotice('Pago aprobado', 'Tu tienda ya tiene productos ilimitados.', '/mi-plan'));
+        }, 3);
 
         return redirect()
             ->back()
@@ -68,22 +72,23 @@ class PaymentProofAdminController extends Controller
 
     public function reject(Request $request, PaymentProof $paymentProof)
     {
-        if (! $paymentProof->isPending()) {
-            return redirect()
-                ->back()
-                ->with('error', 'Este comprobante ya fue revisado.');
-        }
-
         $validated = $request->validate([
-            'admin_notes' => ['nullable', 'string', 'max:1000'],
+            'admin_notes' => ['required', 'string', 'max:1000'],
         ]);
-
-        $paymentProof->forceFill([
-            'status' => PaymentProof::STATUS_REJECTED,
-            'reviewed_by' => Auth::id(),
-            'reviewed_at' => now(),
-            'admin_notes' => $validated['admin_notes'] ?? null,
-        ])->save();
+        DB::transaction(function () use ($paymentProof, $validated) {
+            $store = Store::whereKey($paymentProof->store_id)->lockForUpdate()->firstOrFail();
+            $paymentProof = PaymentProof::whereKey($paymentProof->id)->lockForUpdate()->firstOrFail();
+            if (! $paymentProof->isPending()) {
+                throw ValidationException::withMessages(['payment' => 'Este comprobante ya fue revisado.']);
+            }
+            $paymentProof->forceFill([
+                'status' => PaymentProof::STATUS_REJECTED,
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+                'admin_notes' => $validated['admin_notes'],
+            ])->save();
+            $store->user->notify(new MarketplaceNotice('Comprobante rechazado', $validated['admin_notes'], '/mi-plan'));
+        }, 3);
 
         return redirect()
             ->back()

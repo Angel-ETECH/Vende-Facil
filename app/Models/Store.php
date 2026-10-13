@@ -87,7 +87,7 @@ class Store extends Model
 
     public function mapUrl(): ?string
     {
-        if ($this->location_url) {
+        if ($this->location_url && in_array(strtolower((string) parse_url($this->location_url, PHP_URL_SCHEME)), ['http', 'https'], true)) {
             return $this->location_url;
         }
 
@@ -100,6 +100,22 @@ class Store extends Model
 
     public function mapEmbedUrl(): ?string
     {
+        $query = null;
+        $host = strtolower((string) parse_url((string) $this->location_url, PHP_URL_HOST));
+        if (in_array($host, ['google.com', 'www.google.com', 'maps.google.com', 'google.com.pe', 'www.google.com.pe'], true)) {
+            parse_str((string) parse_url($this->location_url, PHP_URL_QUERY), $parameters);
+            $candidate = $parameters['q'] ?? $parameters['query'] ?? null;
+            if (is_string($candidate) && $candidate !== '') {
+                $query = $candidate;
+            } elseif (preg_match('/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/', rawurldecode($this->location_url), $coordinates)) {
+                $query = $coordinates[1].','.$coordinates[2];
+            } elseif (preg_match('/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/', rawurldecode($this->location_url), $coordinates)) {
+                $query = $coordinates[1].','.$coordinates[2];
+            }
+        }
+        if ($query !== null) {
+            return 'https://www.google.com/maps?q='.urlencode($query).'&output=embed';
+        }
         if (! $this->address && ! $this->city) {
             return null;
         }
@@ -125,7 +141,7 @@ class Store extends Model
             'Instagram' => $this->instagram_url,
             'TikTok' => $this->tiktok_url,
             'Web' => $this->website_url,
-        ]);
+        ], fn ($url) => is_string($url) && in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true));
     }
 
     public function user()

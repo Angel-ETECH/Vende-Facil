@@ -23,16 +23,14 @@ class SitemapController extends Controller
 
         try {
             Category::query()
-                ->withCount([
-                    'products' => function ($query) {
+                ->whereHas('products', function ($query) {
                         $query
                             ->where('active', true)
+                            ->where('stock', '>', 0)
                             ->whereHas('store', function ($storeQuery) {
                                 $storeQuery->where('active', true);
                             });
-                    },
-                ])
-                ->having('products_count', '>', 0)
+                })
                 ->latest('updated_at')
                 ->get(['id', 'slug', 'updated_at'])
                 ->each(function (Category $category) use ($urls): void {
@@ -73,8 +71,11 @@ class SitemapController extends Controller
                         'priority' => '0.8',
                     ]);
                 });
-        } catch (Throwable) {
-            //
+        } catch (Throwable $exception) {
+            report($exception);
+            return response('El mapa del sitio no esta disponible temporalmente.', 503)
+                ->header('Content-Type', 'text/plain; charset=UTF-8')
+                ->header('Cache-Control', 'no-store');
         }
 
         return response()
@@ -92,6 +93,13 @@ class SitemapController extends Controller
             'Disallow: /profile',
             'Disallow: /productos',
             'Disallow: /mi-tienda',
+            'Disallow: /mi-plan',
+            'Disallow: /pagos',
+            'Disallow: /comprobantes',
+            'Disallow: /notificaciones',
+            'Disallow: /favoritos',
+            'Disallow: /estadisticas',
+            'Disallow: /denunciar',
             'Disallow: /login',
             'Disallow: /register',
             'Disallow: /forgot-password',

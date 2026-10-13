@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Store;
 use App\Models\StoreVisit;
 use App\Support\SafePublicStorage;
+use App\Support\OptimizedImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
@@ -17,12 +21,14 @@ class StoreController extends Controller
 
     public function create()
     {
+        if (Auth::user()->stores()->exists()) { return redirect()->route('stores.edit'); }
         return view('stores.create');
     }
 
 
     public function store(Request $request)
     {
+        if (Auth::user()->stores()->exists()) { return redirect()->route('stores.edit'); }
         $request->merge([
             'whatsapp' => $this->normalizePeruWhatsapp($request->whatsapp),
         ]);
@@ -39,12 +45,12 @@ class StoreController extends Controller
             ],
             'city' => ['bail', 'required', 'string', 'max:100'],
             'delivery_available' => ['nullable', 'boolean'],
-            'location_url' => ['nullable', 'url', 'max:500'],
+            'location_url' => ['nullable', 'url:http,https', 'max:500'],
             'opening_hours' => ['nullable', 'string', 'max:255'],
-            'facebook_url' => ['nullable', 'url', 'max:500'],
-            'instagram_url' => ['nullable', 'url', 'max:500'],
-            'tiktok_url' => ['nullable', 'url', 'max:500'],
-            'website_url' => ['nullable', 'url', 'max:500'],
+            'facebook_url' => ['nullable', 'url:http,https', 'max:500'],
+            'instagram_url' => ['nullable', 'url:http,https', 'max:500'],
+            'tiktok_url' => ['nullable', 'url:http,https', 'max:500'],
+            'website_url' => ['nullable', 'url:http,https', 'max:500'],
             'logo' => [
                 'nullable',
                 File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048),
@@ -60,35 +66,48 @@ class StoreController extends Controller
         ]);
 
 
-        $logoPath = null;
+        $uploadedPaths = [];
+        try {
+            DB::transaction(function () use ($request, $validated, &$uploadedPaths) {
+                $user = User::whereKey(Auth::id())->lockForUpdate()->firstOrFail();
+                if ($user->stores()->exists()) {
+                    throw ValidationException::withMessages(['name' => 'Ya tienes una tienda. Puedes editarla desde tu panel.']);
+                }
+                $logoPath = null;
 
 
-        if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')
-                ->store('stores/logos', 'public');
+                if ($request->hasFile('logo')) {
+                    $logoPath = OptimizedImage::store($request->file('logo'), 'stores/logos');
+                    $uploadedPaths[] = $logoPath;
+                }
+
+                $galleryImages = $this->storeUploadedGalleryImages($request, 'gallery_images', 'stores/gallery');
+                $uploadedPaths = array_merge($uploadedPaths, $galleryImages);
+
+                $baseSlug = Str::slug($validated['name']) ?: 'tienda';
+
+                Auth::user()->stores()->create([
+                    'name' => $validated['name'],
+                    'slug' => $baseSlug . '-' . Str::random(5),
+                    'logo' => $logoPath,
+                    'gallery_images' => $galleryImages,
+                    'description' => $validated['description'] ?? null,
+                    'whatsapp' => $validated['whatsapp'],
+                    'address' => $validated['address'] ?? null,
+                    'location_url' => $validated['location_url'] ?? null,
+                    'city' => $validated['city'],
+                    'delivery_available' => $request->boolean('delivery_available'),
+                    'opening_hours' => $validated['opening_hours'] ?? null,
+                    'facebook_url' => $validated['facebook_url'] ?? null,
+                    'instagram_url' => $validated['instagram_url'] ?? null,
+                    'tiktok_url' => $validated['tiktok_url'] ?? null,
+                    'website_url' => $validated['website_url'] ?? null,
+                ]);
+            });
+        } catch (\Throwable $exception) {
+            foreach ($uploadedPaths as $path) { $this->deletePublicUpload($path, 'stores/'); }
+            throw $exception;
         }
-
-        $galleryImages = $this->storeUploadedGalleryImages($request, 'gallery_images', 'stores/gallery');
-
-        $baseSlug = Str::slug($validated['name']) ?: 'tienda';
-
-        Auth::user()->stores()->create([
-            'name' => $validated['name'],
-            'slug' => $baseSlug . '-' . Str::random(5),
-            'logo' => $logoPath,
-            'gallery_images' => $galleryImages,
-            'description' => $validated['description'] ?? null,
-            'whatsapp' => $validated['whatsapp'],
-            'address' => $validated['address'] ?? null,
-            'location_url' => $validated['location_url'] ?? null,
-            'city' => $validated['city'],
-            'delivery_available' => $request->boolean('delivery_available'),
-            'opening_hours' => $validated['opening_hours'] ?? null,
-            'facebook_url' => $validated['facebook_url'] ?? null,
-            'instagram_url' => $validated['instagram_url'] ?? null,
-            'tiktok_url' => $validated['tiktok_url'] ?? null,
-            'website_url' => $validated['website_url'] ?? null,
-        ]);
 
 
         return redirect()
@@ -140,12 +159,12 @@ class StoreController extends Controller
             ],
             'city' => ['bail', 'required', 'string', 'max:100'],
             'delivery_available' => ['nullable', 'boolean'],
-            'location_url' => ['nullable', 'url', 'max:500'],
+            'location_url' => ['nullable', 'url:http,https', 'max:500'],
             'opening_hours' => ['nullable', 'string', 'max:255'],
-            'facebook_url' => ['nullable', 'url', 'max:500'],
-            'instagram_url' => ['nullable', 'url', 'max:500'],
-            'tiktok_url' => ['nullable', 'url', 'max:500'],
-            'website_url' => ['nullable', 'url', 'max:500'],
+            'facebook_url' => ['nullable', 'url:http,https', 'max:500'],
+            'instagram_url' => ['nullable', 'url:http,https', 'max:500'],
+            'tiktok_url' => ['nullable', 'url:http,https', 'max:500'],
+            'website_url' => ['nullable', 'url:http,https', 'max:500'],
             'logo' => [
                 'nullable',
                 File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048),
@@ -163,42 +182,55 @@ class StoreController extends Controller
         ]);
 
 
-        $logoPath = $store->logo;
+        $uploadedPaths = [];
+        try {
+            $logoPath = $store->logo;
+            $oldLogoPath = $store->logo;
+            $oldGalleryImages = $store->gallery_images ?? [];
 
 
-        if ($request->hasFile('logo')) {
+            if ($request->hasFile('logo')) {
 
-            $this->deletePublicUpload($store->logo, 'stores/logos/');
+                $logoPath = OptimizedImage::store($request->file('logo'), 'stores/logos');
+                $uploadedPaths[] = $logoPath;
+            }
 
+            $newGalleryImages = $this->storeUploadedGalleryImages($request, 'gallery_images', 'stores/gallery');
+            $uploadedPaths = array_merge($uploadedPaths, $newGalleryImages);
 
-            $logoPath = $request->file('logo')
-                ->store('stores/logos', 'public');
+            $galleryImages = $this->syncGalleryImages(
+                $store->gallery_images ?? [],
+                $request->input('remove_gallery_images', []),
+                $newGalleryImages,
+                'stores/gallery/',
+                6
+            );
+
+            $store->update([
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'whatsapp' => $validated['whatsapp'],
+                'address' => $validated['address'] ?? null,
+                'location_url' => $validated['location_url'] ?? null,
+                'city' => $validated['city'],
+                'delivery_available' => $request->boolean('delivery_available'),
+                'opening_hours' => $validated['opening_hours'] ?? null,
+                'facebook_url' => $validated['facebook_url'] ?? null,
+                'instagram_url' => $validated['instagram_url'] ?? null,
+                'tiktok_url' => $validated['tiktok_url'] ?? null,
+                'website_url' => $validated['website_url'] ?? null,
+                'gallery_images' => $galleryImages,
+                'logo' => $logoPath,
+            ]);
+        } catch (\Throwable $exception) {
+            foreach ($uploadedPaths as $path) {
+                $this->deletePublicUpload($path, 'stores/');
+            }
+            throw $exception;
         }
 
-        $galleryImages = $this->syncGalleryImages(
-            $store->gallery_images ?? [],
-            $request->input('remove_gallery_images', []),
-            $this->storeUploadedGalleryImages($request, 'gallery_images', 'stores/gallery'),
-            'stores/gallery/',
-            6
-        );
-
-        $store->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'whatsapp' => $validated['whatsapp'],
-            'address' => $validated['address'] ?? null,
-            'location_url' => $validated['location_url'] ?? null,
-            'city' => $validated['city'],
-            'delivery_available' => $request->boolean('delivery_available'),
-            'opening_hours' => $validated['opening_hours'] ?? null,
-            'facebook_url' => $validated['facebook_url'] ?? null,
-            'instagram_url' => $validated['instagram_url'] ?? null,
-            'tiktok_url' => $validated['tiktok_url'] ?? null,
-            'website_url' => $validated['website_url'] ?? null,
-            'gallery_images' => $galleryImages,
-            'logo' => $logoPath,
-        ]);
+        if ($oldLogoPath !== $logoPath) { $this->deletePublicUpload($oldLogoPath, 'stores/logos/'); }
+        foreach (array_diff($oldGalleryImages, $galleryImages) as $image) { $this->deletePublicUpload($image, 'stores/gallery/'); }
 
 
         return redirect()
@@ -241,8 +273,8 @@ class StoreController extends Controller
             StoreVisit::create([
                 'store_id' => $store->id,
                 'ip_address' => $request->ip(),
-                'user_agent' => (string) $request->userAgent(),
-                'referer' => $request->headers->get('referer'),
+                'user_agent' => Str::substr((string) $request->userAgent(), 0, 1000),
+                'referer' => $request->headers->has('referer') ? Str::substr((string) $request->headers->get('referer'), 0, 255) : null,
             ]);
         }
 
@@ -268,8 +300,11 @@ class StoreController extends Controller
         ));
     }
 
-    private function normalizePeruWhatsapp(?string $value): string
+    private function normalizePeruWhatsapp(mixed $value): string
     {
+        if (! is_string($value) && ! is_int($value)) {
+            return '';
+        }
         $digits = preg_replace('/[^0-9]/', '', (string) $value);
 
         if (strlen($digits) === 9 && str_starts_with($digits, '9')) {
@@ -279,37 +314,4 @@ class StoreController extends Controller
         return $digits;
     }
 
-    private function storeUploadedGalleryImages(Request $request, string $field, string $directory): array
-    {
-        $paths = [];
-
-        foreach ($request->file($field, []) as $file) {
-            $paths[] = $file->store($directory, 'public');
-        }
-
-        return $paths;
-    }
-
-    private function syncGalleryImages(
-        array $currentImages,
-        array $imagesToRemove,
-        array $newImages,
-        string $allowedPrefix,
-        int $limit
-    ): array {
-        $imagesToRemove = array_values(array_intersect($imagesToRemove, $currentImages));
-
-        foreach ($imagesToRemove as $image) {
-            $this->deletePublicUpload($image, $allowedPrefix);
-        }
-
-        $keptImages = array_values(array_diff($currentImages, $imagesToRemove));
-        $limitedImages = array_slice(array_merge($keptImages, $newImages), 0, $limit);
-
-        foreach (array_diff($newImages, $limitedImages) as $unusedImage) {
-            $this->deletePublicUpload($unusedImage, $allowedPrefix);
-        }
-
-        return $limitedImages;
-    }
 }

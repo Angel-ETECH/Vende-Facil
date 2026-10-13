@@ -1,0 +1,10 @@
+<x-app-layout>
+    <x-workspace-page title="Estadisticas de mi tienda">
+        <nav aria-label="Periodo" class="mb-6 flex gap-2">@foreach([7, 30, 90] as $period)<a href="{{ route('seller.analytics', ['dias' => $period]) }}" class="rounded-lg border border-[#eaded5] px-4 py-2 font-bold {{ $days === $period ? 'bg-[#442d35] text-white' : 'bg-white' }}">{{ $period }} dias</a>@endforeach</nav>
+        <dl class="mb-8 grid grid-cols-2 gap-6 border-y border-[#eaded5] py-6"><div><dt class="text-sm text-[#78676a]">Visitas a la tienda</dt><dd class="mt-2 text-3xl font-black">{{ number_format($visits) }}</dd></div><div><dt class="text-sm text-[#78676a]">Consultas por WhatsApp</dt><dd class="mt-2 text-3xl font-black text-[#427764]">{{ number_format($clicks) }}</dd></div></dl>
+        <h2 class="mb-4 text-lg font-black">Productos mas consultados</h2>
+        <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="border-b border-[#eaded5] text-[#78676a]"><tr><th class="py-3">Producto</th><th class="py-3 text-right">Consultas</th></tr></thead><tbody>@forelse($topProducts as $product)<tr class="border-b border-[#eaded5]"><td class="max-w-xs break-words py-4">{{ $product->name }}</td><td class="py-4 text-right font-bold">{{ $product->inquiries_count }}</td></tr>@empty<tr><td colspan="2" class="py-8">Todavia no tienes productos.</td></tr>@endforelse</tbody></table></div>
+        <h2 class="mb-4 mt-8 text-lg font-black">Actividad diaria</h2>
+        <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="border-b border-[#eaded5] text-[#78676a]"><tr><th class="py-3">Fecha</th><th class="py-3 text-right">Visitas</th><th class="py-3 text-right">Consultas</th></tr></thead><tbody>@for($i = 0; $i < $days; $i++) @php($date = now()->subDays($i))<tr class="border-b border-[#eaded5]"><td class="py-3">{{ $date->format('d/m/Y') }}</td><td class="text-right">{{ $dailyVisits[$date->toDateString()] ?? 0 }}</td><td class="text-right">{{ $dailyClicks[$date->toDateString()] ?? 0 }}</td></tr>@endfor</tbody></table></div>
+    </x-workspace-page>
+</x-app-layout>

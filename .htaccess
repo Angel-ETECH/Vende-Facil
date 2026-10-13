@@ -1,6 +1,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    RewriteRule (^|/)\. - [F,L]
+    RewriteRule ^storage/(app|framework|logs)(/|$) - [F,L]
+    RewriteRule ^storage/payment-proofs(/|$) - [F,L]
+    RewriteRule ^(docs|node_modules|scripts)(/|$) - [F,L]
+
     RewriteRule ^(app|bootstrap|config|database|resources|routes|tests|vendor)(/|$) - [F,L]
     RewriteRule ^(\.env|\.env\..*|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml)$ - [F,L]
 

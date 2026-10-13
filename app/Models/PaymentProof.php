@@ -20,6 +20,8 @@ class PaymentProof extends Model
         'payment_number',
         'reference',
         'proof_path',
+        'proof_hash',
+        'reference_key',
         'status',
         'reviewed_by',
         'reviewed_at',
