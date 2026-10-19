@@ -233,262 +233,7 @@
             </form>
 
 
-            {{-- ================================================= --}}
-            {{-- CATEGORÍAS FUNCIONALES --}}
-            {{-- ================================================= --}}
-            <div class="vf-hero-categories mt-7">
-
-                <div class="flex flex-wrap gap-3">
-
-                    {{-- TODOS --}}
-                    <a
-                        href="{{ route('home', array_filter([
-                            'buscar' => $search ?: null,
-                            'ciudad' => $city ?: null,
-                            'delivery' => $delivery ? 1 : null,
-                        ])) }}#productos"
-                        class="
-                            inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition
-
-                            {{ !$selectedCategory
-                                ? 'bg-[#442d35] text-white shadow-md'
-                                : 'bg-white/75 text-[#684f53] hover:bg-white'
-                            }}
-                        "
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.8"
-                            stroke="currentColor"
-                            class="h-4 w-4"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4.5 6.75h15M4.5 12h15M4.5 17.25h15"
-                            />
-                        </svg>
-
-                        Todos
-                    </a>
-
-
-                    @foreach($categories as $category)
-
-                        <a
-                            href="{{ route('categories.show', array_filter([
-                                'category' => $category->slug,
-                                'buscar' => $search ?: null,
-                                'ciudad' => $city ?: null,
-                                'delivery' => $delivery ? 1 : null,
-                            ])) }}#productos"
-                            class="
-                                inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition
-
-                                {{ $selectedCategory?->id === $category->id
-                                    ? 'bg-[#ff6b57] text-white shadow-md'
-                                    : 'bg-white/75 text-[#684f53] hover:bg-white'
-                                }}
-                            "
-                        >
-
-                            {{-- ICONO SEGÚN CATEGORÍA --}}
-                            @switch($category->slug)
-
-                                @case('comida')
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.8"
-                                        stroke="currentColor"
-                                        class="h-4 w-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M6 3.75v6m3-6v6M7.5 9.75v10.5M15.75 3.75c2.25 2.25 2.25 6.75 0 9v7.5"
-                                        />
-                                    </svg>
-
-                                    @break
-
-
-                                @case('moda')
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.8"
-                                        stroke="currentColor"
-                                        class="h-4 w-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M8.25 4.5 12 6.75l3.75-2.25 4.5 4.5-3 2.25V20.25H6.75V11.25l-3-2.25 4.5-4.5Z"
-                                        />
-                                    </svg>
-
-                                    @break
-
-
-                                @case('tecnologia')
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.8"
-                                        stroke="currentColor"
-                                        class="h-4 w-4"
-                                    >
-                                        <rect
-                                            x="4"
-                                            y="4"
-                                            width="16"
-                                            height="12"
-                                            rx="2"
-                                        />
-
-                                        <path
-                                            stroke-linecap="round"
-                                            d="M8 20h8M12 16v4"
-                                        />
-                                    </svg>
-
-                                    @break
-
-
-                                @case('belleza')
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.8"
-                                        stroke="currentColor"
-                                        class="h-4 w-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M9 5.25A2.25 2.25 0 0 1 11.25 3h1.5A2.25 2.25 0 0 1 15 5.25V6h1.5A1.5 1.5 0 0 1 18 7.5v10.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 18V7.5A1.5 1.5 0 0 1 7.5 6H9v-.75Z"
-                                        />
-                                    </svg>
-
-                                    @break
-
-
-                                @case('hogar')
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.8"
-                                        stroke="currentColor"
-                                        class="h-4 w-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M3.75 10.5 12 4.5l8.25 6V19.5H15v-5.25H9V19.5H3.75v-9Z"
-                                        />
-                                    </svg>
-
-                                    @break
-
-
-                                @case('regalos')
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.8"
-                                        stroke="currentColor"
-                                        class="h-4 w-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M3.75 9h16.5v11.25H3.75V9Zm8.25 0v11.25M2.25 6.75h19.5V9H2.25V6.75ZM12 6.75c-1.5-3-4.5-3-4.5-1.125S9.75 6.75 12 6.75Zm0 0c1.5-3 4.5-3 4.5-1.125S14.25 6.75 12 6.75Z"
-                                        />
-                                    </svg>
-
-                                    @break
-
-
-                                @case('servicios')
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.8"
-                                        stroke="currentColor"
-                                        class="h-4 w-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M14.25 6.75a4.5 4.5 0 0 0-5.91 5.91L3.75 17.25l3 3 4.59-4.59a4.5 4.5 0 0 0 5.91-5.91l-2.5 2.5-3-3 2.5-2.5Z"
-                                        />
-                                    </svg>
-
-                                    @break
-
-
-                                @default
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.8"
-                                        stroke="currentColor"
-                                        class="h-4 w-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M4.5 5.25h6v6h-6v-6Zm9 0h6v6h-6v-6Zm-9 9h6v6h-6v-6Zm9 0h6v6h-6v-6Z"
-                                        />
-                                    </svg>
-
-                            @endswitch
-
-
-                            {{ $category->name }}
-
-
-                            @if($category->products_count > 0)
-
-                                <span
-                                    class="
-                                        rounded-full px-2 py-0.5 text-[10px] font-black
-
-                                        {{ $selectedCategory?->id === $category->id
-                                            ? 'bg-white/20 text-white'
-                                            : 'bg-[#fff0db] text-[#a36c53]'
-                                        }}
-                                    "
-                                >
-                                    {{ $category->products_count }}
-                                </span>
-
-                            @endif
-
-                        </a>
-
-                    @endforeach
-
-                </div>
+            <div class="vf-hero-active-filters">
 
 
                 {{-- FILTROS ACTIVOS --}}
@@ -692,18 +437,13 @@
 {{-- ========================================================= --}}
 <section
     id="productos"
-    class="relative overflow-hidden py-20"
+    class="vf-discovery relative overflow-hidden py-20 {{ $products->count() > 0 && $products->count() < 3 ? 'vf-discovery--compact' : '' }}"
 >
-
-    <div
-        class="absolute -left-24 top-20 h-56 w-56 rounded-full bg-[#ffb8c8]/30"
-    ></div>
-
 
     <div class="vf-container relative">
 
         <div
-            class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"
+            class="vf-discovery-heading flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"
         >
 
             <div>
@@ -802,6 +542,28 @@
 
                 @endif
 
+                    <nav class="vf-category-directory" aria-label="Explorar categorías">
+                        <a href="{{ route('home', array_filter(['buscar' => $search !== '' ? $search : null, 'ciudad' => $city ?: null, 'delivery' => $delivery ? 1 : null])) }}#productos" @if(!$selectedCategory) aria-current="page" @endif>
+                            <span class="vf-category-directory__icon"><i data-lucide="shapes" aria-hidden="true"></i></span>
+                            <span>Todos</span>
+                            <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+                        </a>
+                        @foreach($categories as $category)
+                            @php
+                                $categoryIcon = match($category->slug) {
+                                    'comida' => 'utensils', 'moda' => 'shirt',
+                                    'tecnologia' => 'monitor', 'belleza' => 'sparkles',
+                                    'hogar' => 'house', 'regalos' => 'gift',
+                                    'servicios' => 'wrench', default => 'shapes',
+                                };
+                            @endphp
+                            <a href="{{ route('categories.show', array_filter(['category' => $category->slug, 'buscar' => $search !== '' ? $search : null, 'ciudad' => $city ?: null, 'delivery' => $delivery ? 1 : null])) }}#productos" @if($selectedCategory?->id === $category->id) aria-current="page" @endif>
+                                <span class="vf-category-directory__icon"><i data-lucide="{{ $categoryIcon }}" aria-hidden="true"></i></span>
+                                <span>{{ $category->name }}</span>
+                                <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+                            </a>
+                        @endforeach
+                    </nav>
             </div>
 
 
@@ -913,23 +675,26 @@
 
         @else
 
-            <div
-                class="mt-11 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
-            >
+            <div class="vf-product-carousel mt-11" x-data="productCarousel" role="region" aria-label="Productos recientes" aria-roledescription="carrusel">
+                <div class="vf-carousel-controls" x-show="hasOverflow" x-cloak>
+                    <button type="button" class="vf-carousel-arrow" @click="move(-1)" :disabled="atStart" aria-label="Productos anteriores" title="Productos anteriores" aria-controls="product-carousel-track"><i data-lucide="chevron-left" aria-hidden="true"></i></button>
+                    <button type="button" class="vf-carousel-arrow" @click="move(1)" :disabled="atEnd" aria-label="Siguientes productos" title="Siguientes productos" aria-controls="product-carousel-track"><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+                </div>
+                <div id="product-carousel-track" class="vf-product-grid" x-ref="track" @scroll.debounce.50ms="update()" @keydown.left.prevent="move(-1)" @keydown.right.prevent="move(1)" tabindex="0" aria-label="Lista de productos">
 
                 @foreach($products as $product)
 
-                    <div class="relative min-w-0">
+                    <div class="vf-product-item relative min-w-0">
                     <div class="absolute right-3 top-3 z-10"><x-favorite-button type="product" :id="$product->id" /></div>
 
                     <a
                         href="{{ route('stores.show', $product->store) }}"
-                        class="vf-card vf-product-image group overflow-hidden rounded-[28px] border border-[#eaded5] bg-[#fffdf9]"
+                        class="vf-card vf-catalog-card vf-product-image group overflow-hidden border bg-white"
                     >
 
                         {{-- IMAGEN --}}
                         <div
-                            class="relative h-[270px] overflow-hidden"
+                            class="vf-catalog-card__media relative overflow-hidden"
                         >
 
                             @if($product->image)
@@ -970,28 +735,17 @@
 
                             {{-- TIENDA --}}
                             <span
-                                class="absolute left-4 top-4 max-w-[calc(100%-2rem)] truncate rounded-full bg-white/90 px-3 py-2 text-xs font-black text-[#5f474b] shadow-md backdrop-blur"
+                                class="absolute left-4 top-4 max-w-[calc(100%-5rem)] truncate rounded-full bg-white/90 px-3 py-2 text-xs font-black text-[#5f474b] shadow-md backdrop-blur"
                             >
                                 {{ $product->store->name }}
                             </span>
 
 
-                            {{-- CATEGORÍA --}}
-                            @if($product->category)
-
-                                <span
-                                    class="absolute bottom-4 left-4 rounded-full bg-[#442d35]/90 px-3 py-1.5 text-[11px] font-black text-white backdrop-blur"
-                                >
-                                    {{ $product->category->name }}
-                                </span>
-
-                            @endif
-
                         </div>
 
 
                         {{-- INFORMACIÓN --}}
-                        <div class="p-5">
+                        <div class="vf-catalog-card__body p-5">
 
                             <div class="mb-3 flex flex-wrap gap-2">
 
@@ -1112,6 +866,8 @@
 
                 @endforeach
 
+                </div>
+
             </div>
 
 
@@ -1137,18 +893,13 @@
 {{-- ========================================================= --}}
 <section
     id="tiendas"
-    class="relative overflow-hidden bg-[#f4eadf] py-20"
+    class="vf-store-discovery relative overflow-hidden py-20 {{ $stores->count() === 1 ? 'vf-store-discovery--compact' : '' }}"
 >
-
-    <div
-        class="vf-doodle -right-16 top-24 h-64 w-64 vf-blob bg-[#ffd66b]/50"
-    ></div>
-
 
     <div class="vf-container relative">
 
         <div
-            class="grid gap-8 lg:grid-cols-[.7fr_1.3fr] lg:items-end"
+            class="vf-stores-heading grid gap-8 lg:grid-cols-[.7fr_1.3fr] lg:items-end"
         >
 
             <div>
@@ -1246,176 +997,59 @@
         @else
 
             <div
-                class="mt-12 grid gap-7 md:grid-cols-2 lg:grid-cols-3"
+                class="vf-store-grid mt-12 grid gap-7"
             >
 
                 @foreach($stores as $store)
 
-                    @php
-                        $coverClass = match($loop->index % 4) {
-                            0 => 'vf-shop-cover-1',
-                            1 => 'vf-shop-cover-2',
-                            2 => 'vf-shop-cover-3',
-                            default => 'vf-shop-cover-4',
-                        };
-                    @endphp
-
-
                     <a
                         href="{{ route('stores.show', $store) }}"
-                        class="vf-card group overflow-hidden rounded-[32px] bg-[#fffdf9]"
+                        class="vf-card vf-store-card group overflow-hidden bg-white"
                     >
 
-                        {{-- PORTADA --}}
-                        <div
-                            class="relative h-[145px] {{ $coverClass }}"
-                        >
-
-                            <div
-                                class="absolute right-5 top-5 rounded-full bg-white/25 px-3 py-1.5 text-xs font-black text-white backdrop-blur-md"
-                            >
-                                Abierto
+                        @if(!empty($store->gallery_images))
+                            <div class="vf-store-card__cover">
+                                <img src="{{ asset('storage/' . $store->gallery_images[0]) }}" alt="" loading="lazy" class="h-full w-full object-cover">
                             </div>
+                        @endif
 
-                            @if($store->isFeatured())
-                                <div
-                                    class="absolute left-5 top-5 rounded-full bg-[#ffd66b] px-3 py-1.5 text-xs font-black text-[#4e3b20] shadow-sm"
-                                >
-                                    Destacada
+                        <div class="vf-store-card__body">
+                            @if($store->isFeatured() || $store->isVerified())
+                                <div class="vf-store-card__badges">
+                                    @if($store->isFeatured())
+                                        <span class="vf-store-card__featured">Tienda destacada</span>
+                                    @endif
+                                    @if($store->isVerified())
+                                        <span class="vf-store-card__verified"><i data-lucide="badge-check" aria-hidden="true"></i> Verificada</span>
+                                    @endif
                                 </div>
                             @endif
 
-                            @if($store->isVerified())
-                                <div
-                                    class="absolute bottom-5 left-5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-black text-[#427764] shadow-sm backdrop-blur"
-                                >
-                                    Verificada
-                                </div>
-                            @endif
-
-                        </div>
-
-
-                        {{-- INFO --}}
-                        <div class="relative px-6 pb-6">
-
-                            <div class="-mt-11">
-
+                            <div class="vf-store-card__identity">
                                 @if($store->logo)
-
-                                    <img
-                                        src="{{ asset('storage/' . $store->logo) }}"
-                                        alt="{{ $store->name }}"
-                                        class="h-[88px] w-[88px] rounded-[25px] border-[5px] border-[#fffdf9] bg-white object-cover shadow-lg"
-                                    >
-
+                                    <img src="{{ asset('storage/' . $store->logo) }}" alt="{{ $store->name }}" loading="lazy" class="vf-store-logo bg-white object-contain">
                                 @else
-
-                                    <div
-                                        class="flex h-[88px] w-[88px] items-center justify-center rounded-[25px] border-[5px] border-[#fffdf9] bg-[#ffd66b] text-3xl font-black shadow-lg"
-                                    >
-                                        {{ strtoupper(substr($store->name, 0, 1)) }}
-                                    </div>
-
+                                    <span class="vf-store-logo vf-store-logo--initial" aria-hidden="true">{{ mb_strtoupper(mb_substr($store->name, 0, 1)) }}</span>
                                 @endif
-
+                                <div>
+                                    <h3>{{ $store->name }}</h3>
+                                    <p class="vf-store-card__city"><i data-lucide="map-pin" aria-hidden="true"></i>{{ $store->city ?: 'Perú' }}</p>
+                                </div>
                             </div>
 
+                            <p class="vf-store-card__description">{{ $store->description ?: 'Descubre lo que este negocio tiene para ti.' }}</p>
 
-                            <div class="mt-4">
-
-                                <h3
-                                    class="text-[23px] font-black tracking-[-.035em] text-[#38292c]"
-                                >
-                                    {{ $store->name }}
-                                </h3>
-
-
-                                <div class="mt-3 flex flex-wrap gap-2">
-
-                                    <span
-                                        class="inline-flex max-w-full items-center gap-2 rounded-full bg-[#fff0db] px-3 py-1.5 text-[11px] font-black text-[#a36c53]"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.8"
-                                            stroke="currentColor"
-                                            class="h-3.5 w-3.5 flex-shrink-0 text-[#f26452]"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M12 21s6.75-4.2 6.75-10.5a6.75 6.75 0 1 0-13.5 0C5.25 16.8 12 21 12 21Z"
-                                            />
-                                            <circle cx="12" cy="10.5" r="2"/>
-                                        </svg>
-
-                                        <span class="truncate">
-                                            {{ $store->city ? $store->city . ', Perú' : 'Perú' }}
-                                        </span>
-                                    </span>
-
-
-                                    <span
-                                        class="inline-flex rounded-full px-3 py-1.5 text-[11px] font-black {{ $store->delivery_available ? 'bg-[#e7f5ef] text-[#427764]' : 'bg-[#eee5df] text-[#8b7678]' }}"
-                                    >
-                                        {{ $store->delivery_available ? 'Hace delivery' : 'Sin delivery' }}
-                                    </span>
-
-                                </div>
-
+                            <div class="vf-store-card__details">
+                                <span>{{ $store->delivery_available ? 'Con delivery' : 'Sin delivery' }}</span>
                                 @if($store->address)
-                                    <p class="mt-2 truncate text-xs font-bold text-[#9a8185]">
-                                        {{ $store->address }}
-                                    </p>
+                                    <span class="vf-store-card__address">{{ $store->address }}</span>
                                 @endif
-
-
-                                <p
-                                    class="mt-4 line-clamp-2 min-h-[48px] text-sm leading-6 text-[#796669]"
-                                >
-                                    {{ $store->description ?: 'Una tienda con cosas que podrían gustarte mucho.' }}
-                                </p>
-
-
-                                <div
-                                    class="mt-6 flex items-center justify-between border-t border-[#eee2d9] pt-5"
-                                >
-
-                                    <div>
-
-                                        <div
-                                            class="text-xs font-bold uppercase tracking-[.1em] text-[#ae9295]"
-                                        >
-                                            Catálogo
-                                        </div>
-
-                                        <div
-                                            class="mt-1 font-black text-[#48373a]"
-                                        >
-                                            {{ $store->products_count }}
-
-                                            {{ $store->products_count == 1
-                                                ? 'producto'
-                                                : 'productos'
-                                            }}
-                                        </div>
-
-                                    </div>
-
-
-                                    <div
-                                        class="rounded-full bg-[#3e2030] px-4 py-2 text-sm font-black text-white transition group-hover:bg-[#ff6b57]"
-                                    >
-                                        Entrar →
-                                    </div>
-
-                                </div>
-
                             </div>
 
+                            <div class="vf-store-card__footer">
+                                <span><strong>{{ $store->products_count }}</strong> {{ $store->products_count == 1 ? 'producto' : 'productos' }}</span>
+                                <span class="vf-store-card__visit">Ver tienda <i data-lucide="arrow-right" aria-hidden="true"></i></span>
+                            </div>
                         </div>
 
                     </a>
@@ -1437,7 +1071,7 @@
 {{-- ========================================================= --}}
 <section
     id="como-funciona"
-    class="relative overflow-hidden bg-[#fffaf2] py-20"
+    class="vf-how-it-works relative overflow-hidden py-20"
 >
 
     <div class="vf-container">
@@ -1462,11 +1096,11 @@
         </div>
 
 
-        <div class="mt-14 grid gap-5 md:grid-cols-3">
+        <div class="vf-steps mt-14 grid gap-5 md:grid-cols-3">
 
             {{-- PASO 1 --}}
             <div
-                class="vf-card rounded-[34px] bg-[#ffd66b] p-8"
+                class="vf-step vf-step--discover p-8"
             >
 
                 <div
@@ -1515,7 +1149,7 @@
 
             {{-- PASO 2 --}}
             <div
-                class="vf-card rounded-[34px] bg-[#ffb8c8] p-8"
+                class="vf-step vf-step--choose p-8"
             >
 
                 <div
@@ -1564,7 +1198,7 @@
 
             {{-- PASO 3 --}}
             <div
-                class="vf-card rounded-[34px] bg-[#98dbc6] p-8"
+                class="vf-step vf-step--contact p-8"
             >
 
                 <div
@@ -1623,16 +1257,11 @@
 {{-- ========================================================= --}}
 @guest
 
-<section class="px-3 pb-20 sm:px-6">
+<section class="vf-seller-invitation">
 
     <div
-        class="vf-container relative overflow-hidden rounded-[42px] bg-[#ff6b57] px-6 py-14 sm:px-12 lg:px-16"
+        class="vf-container relative py-14"
     >
-
-        <div
-            class="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-[#ffd66b]"
-        ></div>
-
 
         <div
             class="relative flex flex-col gap-9 lg:flex-row lg:items-center lg:justify-between"

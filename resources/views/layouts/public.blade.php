@@ -509,22 +509,13 @@
         class="relative overflow-hidden bg-[#3e2030] text-white"
     >
 
-        <div
-            class="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#ff6b57] opacity-20"
-        ></div>
-
-        <div
-            class="absolute -bottom-20 left-20 h-52 w-52 rounded-full bg-[#ffd66b] opacity-10"
-        ></div>
-
-
         <div class="vf-container relative py-14">
 
             <div class="grid gap-10 md:grid-cols-2">
 
                 <div>
 
-                    <div class="text-3xl font-black tracking-[-.05em]">
+                    <div class="text-3xl font-black">
                         Vende<span class="text-[#ff927d]">Fácil</span>
                     </div>
 
@@ -537,36 +528,12 @@
                 </div>
 
 
-                <div class="md:text-right">
-
-                    <p
-                        class="text-sm font-bold uppercase tracking-[.18em] text-[#d7b4c3]"
-                    >
-                        ¿Tienes un negocio?
-                    </p>
-
-
-                    @guest
-
-                        <a
-                            href="{{ route('register') }}"
-                            class="mt-4 inline-flex rounded-full bg-[#ffd66b] px-6 py-3 font-black text-[#3e2030] transition hover:scale-[1.03]"
-                        >
-                            Quiero vender aquí ✨
-                        </a>
-
-                    @else
-
-                        <a
-                            href="{{ route('dashboard') }}"
-                            class="mt-4 inline-flex rounded-full bg-[#ffd66b] px-6 py-3 font-black text-[#3e2030]"
-                        >
-                            Ir a mi negocio
-                        </a>
-
-                    @endguest
-
-                </div>
+                <nav class="flex flex-wrap items-start gap-x-6 gap-y-3 text-sm font-bold text-[#ead8de] md:justify-end" aria-label="Navegación del pie de página">
+                    <a href="{{ route('home') }}" class="hover:text-white">Inicio</a>
+                    <a href="{{ route('home') }}#productos" class="hover:text-white">Productos</a>
+                    <a href="{{ route('home') }}#tiendas" class="hover:text-white">Tiendas</a>
+                    <a href="{{ route('home') }}#como-funciona" class="hover:text-white">Cómo funciona</a>
+                </nav>
 
             </div>
 
