@@ -8,17 +8,18 @@ use Illuminate\Support\Facades\Storage;
 
 class LaunchCheck extends Command
 {
-    protected $signature = 'vendefacil:launch-check';
+    protected $signature = 'vendefacil:launch-check {--local : Revisa desarrollo sin exigir configuracion de produccion}';
     protected $description = 'Verifica la configuracion necesaria para publicar sin mostrar secretos.';
 
     public function handle(): int
     {
+        $local = (bool) $this->option('local');
         $checks = [
-            'Entorno de produccion' => app()->isProduction(),
+            'Entorno apropiado' => $local ? app()->environment(['local', 'testing']) : app()->isProduction(),
             'Depuracion desactivada' => ! config('app.debug'),
-            'URL HTTPS' => str_starts_with(config('app.url'), 'https://'),
+            'URL de la instalacion' => $local ? (bool) filter_var(config('app.url'), FILTER_VALIDATE_URL) : str_starts_with(config('app.url'), 'https://'),
             'Clave de cifrado configurada' => filled(config('app.key')),
-            'Cookies seguras' => (bool) config('session.secure'),
+            'Cookies apropiadas para la URL' => ($local && ! str_starts_with(config('app.url'), 'https://')) || (bool) config('session.secure'),
             'Cookies HTTP only' => (bool) config('session.http_only'),
             'Sesion cifrada' => (bool) config('session.encrypt'),
             'Correo real configurado' => config('mail.default') === 'smtp'
@@ -28,8 +29,13 @@ class LaunchCheck extends Command
                 && filled(config('mail.mailers.smtp.password'))
                 && filter_var(config('mail.from.address'), FILTER_VALIDATE_EMAIL)
                 && ! str_ends_with(config('mail.from.address'), '@example.com'),
-            'Build de produccion disponible' => is_file(public_path('build/manifest.json')) && ! is_file(public_path('hot')),
+            'Interfaz adecuada al entorno' => $local
+                ? (is_file(public_path('build/manifest.json')) || is_file(public_path('hot')))
+                : (is_file(public_path('build/manifest.json')) && ! is_file(public_path('hot'))),
             'Comprobantes fuera del disco publico' => empty(Storage::disk('public')->allFiles('payment-proofs')),
+            'Extension ZIP para respaldos' => class_exists(\ZipArchive::class),
+            'Respaldo privado reciente' => collect(\Illuminate\Support\Facades\File::glob(config('backups.path').'/vendefacil-*.zip'))
+                ->contains(fn ($path) => filemtime($path) >= now()->subDays(2)->getTimestamp()),
         ];
         try { DB::select('SELECT 1'); $checks['Conexion de base de datos'] = true; }
         catch (\Throwable) { $checks['Conexion de base de datos'] = false; }

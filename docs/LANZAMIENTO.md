@@ -1,47 +1,53 @@
-# Publicar esta version
+# Publicar VendeFacil
 
-## Preparacion local
+Esta guia sirve para cualquier servidor con PHP 8.2+, Composer y MySQL o SQLite. La raiz web recomendada es la carpeta `public/`. Las instrucciones particulares del alojamiento de prueba estan en [deploy-infinityfree.md](deploy-infinityfree.md).
 
-1. Ejecutar `composer install`, `php artisan migrate` y `php artisan vendefacil:privatize-proofs`.
-2. Ejecutar `php artisan test` y `npm run build`.
-3. No subir `.git`, `.env` de desarrollo, `node_modules`, pruebas, backups ni registros.
-4. Nunca subir `public/hot`: apunta al servidor de desarrollo.
+## Antes de publicar
 
-## Actualizacion del hosting
+1. Guardar una copia con `php artisan vendefacil:backup` y comprobar que puede recuperarse en un entorno separado.
+2. Ejecutar las pruebas y `npm ci && npm run build`. Revisar los resultados de GitHub Actions.
+3. Confirmar las paginas de ayuda, condiciones y privacidad, el importe del plan y los datos publicos de soporte.
+4. Mantener una sola plantilla: `.env.example`. La instalacion utiliza su `.env` privado. No sobrescribirlo con el de otra maquina.
+5. Revisar las credenciales que hayan sido compartidas antes. Cambiar las comprometidas desde el proveedor, sin publicarlas. La rotacion de una `APP_KEY` existente requiere revisar sus datos cifrados y respaldos.
 
-1. Respaldar base de datos y archivos antes de reemplazar la version.
-2. Subir el codigo, las dependencias de produccion y `public/build` completo, incluido su manifest.
-3. Mantener los archivos privados fuera de la carpeta publica. La raiz del dominio debe apuntar a `public`; si se usa la estructura alternativa de InfinityFree, subir tambien ambos `.htaccess` y comprobar sus bloqueos.
-4. Aplicar la nueva migracion `2026_10_12_000004_add_launch_features`. Si el hosting no permite Artisan, migrar una copia de la base localmente y preparar/importar el cambio de esquema revisado. No crear ejecutores publicos de comandos o SQL.
-5. Mover los comprobantes antiguos de `storage/app/public/payment-proofs` a `storage/app/private/payment-proofs` conservando sus nombres. Con Artisan: `php artisan vendefacil:privatize-proofs`. Verificar la copia antes de retirar el original. Si existe una copia fisica en `public/storage`, retirar tambien sus comprobantes.
-6. En el `.env` del hosting usar `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://tu-dominio`, `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
-7. Configurar un servicio SMTP real: `MAIL_MAILER=smtp`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` y `MAIL_FROM_NAME`. Usar los valores del proveedor. `MAIL_MAILER=log` sirve para desarrollo, pero no envia correos a los usuarios.
-8. Cambiar la contrasena expuesta de la base en el panel y actualizar `DB_PASSWORD`. No poner credenciales reales en archivos `.example`.
-9. Planificar el cambio de la `APP_KEY` expuesta con respaldo. Una clave nueva invalida sesiones y puede impedir leer datos cifrados con la anterior. No regenerarla sin revisar los datos existentes.
-10. Ejecutar `php artisan optimize:clear`, `php artisan config:cache`, `php artisan view:cache` y `php artisan vendefacil:launch-check` donde exista consola. No mostrar errores detallados al publico.
+## Instalar o actualizar el servidor
 
-## Comprobacion final
+1. Respaldar la version y los datos existentes. Activar mantenimiento durante la actualizacion.
+2. Subir el codigo y ejecutar `composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader`. Compilar los assets en el proceso de despliegue o subir `public/build` completo, incluido el manifest.
+3. Mantener `storage` y `bootstrap/cache` escribibles por el proceso PHP. Enlazar las imagenes con `php artisan storage:link` donde este disponible.
+4. En una instalacion nueva, crear `.env` desde `.env.example`, configurar la base y generar la clave. En una existente, conservar su `APP_KEY`, sus datos y sus archivos.
+5. Configurar `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://tu-dominio`, `SESSION_SECURE_COOKIE=true` y `SESSION_ENCRYPT=true`.
+6. Configurar el correo real y su direccion remitente. La cuenta Gmail puede usar SMTP; consulta [CONFIGURACION.md](CONFIGURACION.md). Comprobar la entrega real del correo de recuperacion y que el enlace apunta al dominio correcto.
+7. Aplicar `php artisan migrate --force`. No importar una base local completa encima de una base con usuarios reales para actualizar su esquema.
+8. Ejecutar `php artisan vendefacil:privatize-proofs` para comprobantes antiguos y revisar que no queden copias publicas.
+9. Ejecutar `php artisan optimize:clear`, `php artisan config:cache` y `php artisan view:cache`.
+10. Crear un respaldo nuevo, ejecutar `php artisan vendefacil:launch-check` y revisar cada pendiente.
+11. Activar el programador del servidor y los respaldos diarios como indica [RESPALDOS.md](RESPALDOS.md). Guardar tambien copias en otro almacenamiento privado.
+12. Reabrir con `php artisan up` y realizar las comprobaciones funcionales.
 
-- Registrar una cuenta e iniciar sesion; confirmar que puede entrar sin verificar correo y que solo los administradores acceden al admin.
-- Recuperar una contrasena desde un correo real.
-- Publicar 10 productos y comprobar que el producto 11 se bloquea.
-- Enviar comprobante; comprobar que otro vendedor no puede descargarlo.
-- Aprobar el pago y ver activado el plan; rechazar otro con motivo y comprobar la notificacion.
-- Guardar/quitar favoritos; denunciar un producto; revisar/ocultar la publicacion desde el admin.
-- Ver estadisticas y confirmar que son consultas, no ventas confirmadas.
-- Probar en movil y escritorio, con fotos reales, menus, mapas y galerias.
-- Comprobar que `/.env`, `/.git/config`, `/storage/logs/laravel.log`, `/storage/app/private/...` y `/storage/payment-proofs/...` no entregan archivos.
+## Comprobacion funcional
 
-## Correos y cuentas existentes
+- Registro, acceso y recuperacion real de contrasena. Las cuentas no requieren verificar correo para entrar.
+- Roles: un vendedor no entra al admin ni consulta datos privados de otra cuenta.
+- Crear tienda, actualizar ubicacion y fotos, compartir su URL y consultar desde WhatsApp.
+- Publicar hasta el limite gratuito y confirmar el bloqueo del siguiente producto.
+- Adjuntar un comprobante, revisarlo manualmente y ver el resultado en la cuenta.
+- Comprobar que el plan se presenta como pago unico, sin renovacion ni vencimiento programado.
+- Revisar favoritos, denuncias, notificaciones y estadisticas.
+- Probar movil y escritorio, incluyendo ayuda, privacidad, condiciones y enlaces de soporte.
+- Verificar que `/.env`, `/.git/config`, los registros, comprobantes y respaldos no se puedan descargar.
+- Abrir `/sitemap.xml` y `/robots.txt` y enviar el sitemap del dominio definitivo a Search Console.
 
-La verificacion de correo no es obligatoria para ingresar o administrar una tienda. Las cuentas existentes pueden entrar sin modificar `email_verified_at`. En produccion se necesita SMTP funcionando para enviar los correos de recuperacion de contrasena.
+## Archivos que no se publican como contenido web
 
-Las notificaciones de pagos y denuncias se guardan dentro de la cuenta. Los correos de recuperacion usan el sistema de correo de Laravel; no se envia verificacion automatica al registrar una cuenta.
+No subir `.git`, credenciales de desarrollo, respaldos, registros, `node_modules`, pruebas ni ejecutores de diagnostico. `public/hot` es exclusivo del servidor de desarrollo y no debe existir en produccion.
 
-El disco privado no sirve archivos mediante enlaces temporales publicos. Los comprobantes pasan por una ruta autenticada que comprueba al propietario o administrador y descarga el archivo como adjunto.
+Los comprobantes se conservan en el disco privado y solo se descargan mediante la ruta autenticada. Los respaldos privados tampoco tienen rutas web. No ubicar `storage/app/private` dentro del directorio publico.
 
-Las imagenes nuevas se convierten a WebP con un maximo de 1600 pixeles por lado cuando GD/WebP esta disponible. Las anteriores se conservan. Sin GD se guarda el archivo validado original.
+## Verificacion local
 
-En algunos entornos restringidos de Windows, PHP informa que la cache no es escribible aunque puede guardar archivos. Solo para desarrollo, `php scripts/rebuild-windows-cache.php` reconstruye los manifiestos usando los proveedores instalados. No modificar archivos de Laravel en `vendor` para resolverlo.
+`php artisan vendefacil:launch-check --local` revisa la instalacion de desarrollo sin exigir un dominio HTTPS de produccion. No cambia configuracion ni envia correos.
 
-La auditoria de npm de dependencias de produccion no reporto vulnerabilidades durante esta mejora. La cadena de herramientas de Tailwind 3 conserva avisos de desarrollo; se debe planificar su actualizacion y validar los estilos antes de cambiar a Tailwind 4. No usar `npm audit fix --force` sin revisar la migracion.
+Si Windows informa permisos incorrectos en los manifiestos de Laravel aunque pueda escribir archivos, existe `scripts/rebuild-windows-cache.php` como ayuda de desarrollo; no modificar el framework dentro de `vendor`.
+
+La configuracion del servidor definitivo, su cron y la entrega externa de correo deben comprobarse en ese servidor. Que las pruebas locales pasen no sustituye esas comprobaciones.

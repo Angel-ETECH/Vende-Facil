@@ -1,0 +1,68 @@
+name: Comprobar VendeFacil
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: PHP, interfaz y respaldos MySQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-test-only
+          MYSQL_ROOT_HOST: '%'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-test-only"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_KEY: base64:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      DB_URL: ''
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_USERNAME: root
+      DB_PASSWORD: ci-test-only
+      MAIL_MAILER: array
+      SESSION_DRIVER: array
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      BCRYPT_ROUNDS: '4'
+      MYSQLDUMP_PATH: /usr/bin/mysqldump
+      MYSQL_PATH: /usr/bin/mysql
+      VENDEFACIL_MYSQL_BACKUP_TEST: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_sqlite, pdo_mysql, gd, zip, exif
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar cliente MySQL
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+      - name: Instalar dependencias PHP
+        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Instalar dependencias y compilar interfaz
+        run: npm ci && npm run build
+      - name: Ejecutar las pruebas
+        run: php vendor/bin/phpunit
+      - name: Revisar las vistas
+        run: php artisan view:cache

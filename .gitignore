@@ -4,6 +4,8 @@
 .env.backup
 .env.production
 .env.*.backup
+.env.*
+!.env.example
 /storage/app/private/*
 !/storage/app/private/.gitignore
 .phpactor.json

@@ -27,10 +27,11 @@ El proyecto incluye una experiencia pública para explorar productos y tiendas, 
 - Filtros por categoría, ciudad y disponibilidad de delivery.
 - Página pública para cada tienda con sus productos activos.
 - Ubicación de tienda con dirección, ciudad y acceso a Google Maps.
-- Registro y login directo, sin verificación obligatoria de correo; recuperación de contraseña preparada para SMTP.
+- Registro y login directo, sin verificación obligatoria de correo; recuperación de contraseña mediante SMTP configurable, incluido Gmail.
 - Panel para vendedores con administración de tienda.
 - CRUD de productos con imagen, precio, stock y categoría.
 - Límite gratuito de productos y plan de productos ilimitados.
+- Plan ilimitado de pago único por tienda, sin renovación mensual ni vencimiento programado.
 - Subida de comprobantes de pago por Yape o BCP.
 - Contacto directo por WhatsApp para tiendas y productos.
 - Registro de clics a WhatsApp y visitas a tiendas.
@@ -38,6 +39,10 @@ El proyecto incluye una experiencia pública para explorar productos y tiendas, 
 - Favoritos de productos y tiendas, denuncias y notificaciones dentro de la cuenta.
 - Galerías de imágenes, horarios, redes sociales y enlaces para compartir tiendas.
 - Diseño responsive con Blade, Tailwind CSS y Alpine.js.
+- Carrusel de productos y categorías centralizadas en la sección de descubrimiento.
+- Páginas de ayuda, condiciones de uso y privacidad, con contacto de soporte.
+- Respaldos privados verificados de MySQL/SQLite, imágenes y comprobantes, con restauración y retención.
+- Comprobaciones automáticas de PHP, vistas, frontend y restauración MySQL en GitHub Actions.
 
 ## Seguridad
 
@@ -102,6 +107,8 @@ npm install
 ```
 
 Crea el archivo de entorno:
+
+Solo en una instalación nueva. Si ya tienes un `.env` configurado, consérvalo; `.env.example` es la única plantilla y nunca contiene tus claves.
 
 ```bash
 cp .env.example .env
@@ -180,7 +187,22 @@ Ver rutas:
 php artisan route:list
 ```
 
-## Despliegue En InfinityFree
+## Correo, Respaldos Y Publicación
+
+El proyecto puede publicarse en cualquier servidor compatible con Laravel. Las credenciales reales se guardan únicamente en el `.env` de cada instalación.
+
+- [Configuración y Gmail](docs/CONFIGURACION.md)
+- [Respaldos, programación y restauración](docs/RESPALDOS.md)
+- [Guía de publicación](docs/LANZAMIENTO.md)
+
+```bash
+php artisan vendefacil:backup
+php artisan vendefacil:launch-check --local
+```
+
+Los respaldos diarios requieren activar el programador de Laravel en el servidor. La recuperación de contraseña requiere un proveedor de correo configurado y probado.
+
+## Alojamiento De Prueba
 
 Para probar el proyecto en InfinityFree, revisa la guía preparada en:
 
