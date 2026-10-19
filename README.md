@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/vendefacil-home.png" alt="VendeFácil en escritorio y móvil con su portada de mercado artesanal">
+  <img src="docs/images/vendefacil-presentacion-desktop-movil.png" alt="VendeFácil en escritorio y móvil con su portada de mercado artesanal">
 </p>
 
 ## Descripción
