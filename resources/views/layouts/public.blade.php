@@ -533,6 +533,9 @@
                     <a href="{{ route('home') }}#productos" class="hover:text-white">Productos</a>
                     <a href="{{ route('home') }}#tiendas" class="hover:text-white">Tiendas</a>
                     <a href="{{ route('home') }}#como-funciona" class="hover:text-white">Cómo funciona</a>
+                    <a href="{{ route('help') }}" class="hover:text-white">Ayuda y contacto</a>
+                    <a href="{{ route('terms') }}" class="hover:text-white">Condiciones</a>
+                    <a href="{{ route('privacy') }}" class="hover:text-white">Privacidad</a>
                 </nav>
 
             </div>

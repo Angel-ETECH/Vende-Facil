@@ -6,4 +6,6 @@ return [
     'payment_number' => env('VENDEFACIL_PAYMENT_NUMBER', '989652889'),
     'payment_whatsapp' => env('VENDEFACIL_PAYMENT_WHATSAPP', '51989652889'),
     'featured_days' => (int) env('VENDEFACIL_FEATURED_DAYS', 30),
+    'support_whatsapp' => env('VENDEFACIL_SUPPORT_WHATSAPP', env('VENDEFACIL_PAYMENT_WHATSAPP', '51989652889')),
+    'support_email' => env('VENDEFACIL_SUPPORT_EMAIL'),
 ];

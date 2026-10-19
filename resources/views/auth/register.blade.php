@@ -621,6 +621,10 @@ Crea tu cuenta en VendeFácil y empieza a publicar tu negocio.
 
 
                         {{-- BOTÓN --}}
+                        <p class="text-sm leading-6 text-[#806d70]">
+                            Consulta nuestras <a href="{{ route('terms') }}" class="font-bold text-[#b94332] underline">condiciones de uso</a>
+                            y la <a href="{{ route('privacy') }}" class="font-bold text-[#b94332] underline">información de privacidad</a> antes de crear tu cuenta.
+                        </p>
                         <button
                             type="submit"
                             class="mt-2 flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#ff6b57] px-6 py-4 font-black text-white shadow-lg shadow-orange-100 transition hover:bg-[#ed5542]"

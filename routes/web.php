@@ -22,6 +22,10 @@ use App\Http\Controllers\Admin\StoreAdminController;
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
 
+Route::view('/ayuda', 'pages.help')->name('help');
+Route::view('/terminos', 'pages.terms')->name('terms');
+Route::view('/privacidad', 'pages.privacy')->name('privacy');
+
 Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])
     ->name('seo.sitemap');
 

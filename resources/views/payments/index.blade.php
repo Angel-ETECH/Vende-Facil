@@ -143,8 +143,9 @@
                             </div>
 
                             <p class="mt-4 text-xs leading-5 text-[#806d70]">
-                                Monto: S/ {{ $planPrice }}. Sube una captura o PDF del comprobante para que se pueda revisar.
+                                Pago único: S/ {{ $planPrice }}, sin renovación mensual ni vencimiento programado. Sube una captura o PDF del comprobante para su revisión manual.
                             </p>
+                            <a href="{{ route('terms') }}" class="mt-3 inline-block text-sm font-bold text-[#b94332] underline">Consultar las condiciones del plan</a>
                         </div>
                     </div>
                 </div>
